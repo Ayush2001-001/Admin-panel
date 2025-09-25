@@ -8,7 +8,7 @@ export default function Navbar() {
       position="fixed"
       elevation={0} 
       sx={{
-        background: "linear-gradient(135deg, rgba(58,123,213,0.4), rgba(0,210,255,0.4))",
+        backgroundColor:"#a5c6e7ff",
         height: "13vh",
         justifyContent: "center",
       }}
