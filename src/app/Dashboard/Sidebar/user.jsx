@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Box,
   Table,
@@ -20,135 +20,43 @@ import {
   IconButton,
 } from "@mui/material";
 import Image from "next/image";
+import Cookies from "js-cookie";
 
 export default function Users() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      age: 35,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Australia",
-    },
-    {
-      id: 2,
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane@example.com",
-      age: 38,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "America",
-    },
-    {
-      id: 3,
-      firstName: "Michael",
-      lastName: "Johnson",
-      email: "michael@example.com",
-      age: 40,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Ireland",
-    },
-    {
-      id: 4,
-      firstName: "Emma",
-      lastName: "Brown",
-      email: "emma@example.com",
-      age: 28,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Canada",
-    },
-    {
-      id: 5,
-      firstName: "Liam",
-      lastName: "Davis",
-      email: "liam@example.com",
-      age: 32,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "UK",
-    },
-    {
-      id: 6,
-      firstName: "Olivia",
-      lastName: "Miller",
-      email: "olivia@example.com",
-      age: 29,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Germany",
-    },
-    {
-      id: 7,
-      firstName: "Noah",
-      lastName: "Wilson",
-      email: "noah@example.com",
-      age: 36,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "France",
-    },
-    {
-      id: 8,
-      firstName: "Sophia",
-      lastName: "Taylor",
-      email: "sophia@example.com",
-      age: 31,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Spain",
-    },
-    {
-      id: 9,
-      firstName: "James",
-      lastName: "Anderson",
-      email: "james@example.com",
-      age: 45,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Italy",
-    },
-    {
-      id: 10,
-      firstName: "Isabella",
-      lastName: "Thomas",
-      email: "isabella@example.com",
-      age: 27,
-      status: "Active",
-      createdOn: "2025-08-20",
-      updatedOn: "2025-09-10",
-      country: "Japan",
-    },
-  ]);
-
+  const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [countryFilter, setCountryFilter] = useState("All");
   const [currentUser, setCurrentUser] = useState(null);
 
-  const countries = ["All", ...new Set(users.map((u) => u.country))];
+  useEffect(() => {
+    const user = async () => {
+      try {
+        const res = await fetch("http://13.55.191.127:8000/api/users/me/", {
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+        });
+        const data = await res.json();
+        setUsers([data.data]);
+      } catch (err) {
+        console.error("Error fetching user:", err);
+      }
+    };
 
-  const filteredUsers = users.filter((user) => {
-    const matchesSearch = Object.values(user)
+    user();
+  }, []);
+
+  const countries = ["All", ...new Set(users.map((u) => u.country || ""))];
+
+  const filteredUsers = users.filter((u) => {
+    const matchesSearch = Object.values(u)
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase());
     const matchesCountry =
-      countryFilter === "All" || user.country === countryFilter;
+      countryFilter === "All" || u.country === countryFilter;
     return matchesSearch && matchesCountry;
   });
 
@@ -173,7 +81,7 @@ export default function Users() {
       </Typography>
 
       <Box sx={{ display: "flex", gap: 2, mb: 2, ml: 50 }}>
-        <Typography variant="body1" sx={{ textAlign: "start" }}>
+        <Typography variant="body1">
           Total result: {filteredUsers.length}
         </Typography>
         <TextField
@@ -198,65 +106,35 @@ export default function Users() {
           <TableHead>
             <TableRow
               sx={{
-                "& th": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
+                "& th": { backgroundColor: "primary.main", color: "white" },
               }}
             >
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                ID
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                First Name
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Last Name
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Email
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Age
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Status
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Created On
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Updated On
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Country
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Actions
-              </TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>ID</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>First Name</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Last Name</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Email</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Role</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Status</TableCell>
+              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Is Verified</TableCell>
+              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>Actions</TableCell>
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell sx={{ fontSize: 12 }}>{user.id}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.firstName}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.lastName}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.email}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.age}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.status}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.createdOn}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.updatedOn}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{user.country}</TableCell>
+            {filteredUsers.map((u) => (
+              <TableRow key={u.id}>
+                <TableCell sx={{ fontSize: 12 }}>{u.id}</TableCell>
+                <TableCell sx={{ fontSize: 12 }}>{u.first_name}</TableCell>
+                <TableCell sx={{ fontSize: 12 }}>{u.last_name}</TableCell>
+                <TableCell sx={{ fontSize: 12 }}>{u.email}</TableCell>
+                <TableCell sx={{ fontSize: 12 }}>{u.role}</TableCell>
+                <TableCell sx={{ fontSize: 12 }}>{u.status}</TableCell>
+                <TableCell sx={{ fontSize: 12 }}>{u.is_verified ? "True" : "False"}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleEdit(user)}>
+                  <IconButton onClick={() => handleEdit(u)}>
                     <Image src="/edit.svg" alt="Edit" width={15} height={15} />
                   </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(user.id)}
-                  >
+                  <IconButton color="error" onClick={() => handleDelete(u.id)}>
                     <Image
                       src="/delete.svg"
                       alt="Delete"
@@ -284,16 +162,16 @@ export default function Users() {
         >
           <TextField
             label="First Name"
-            value={currentUser?.firstName || ""}
+            value={currentUser?.first_name || ""}
             onChange={(e) =>
-              setCurrentUser({ ...currentUser, firstName: e.target.value })
+              setCurrentUser({ ...currentUser, first_name: e.target.value })
             }
           />
           <TextField
             label="Last Name"
-            value={currentUser?.lastName || ""}
+            value={currentUser?.last_name || ""}
             onChange={(e) =>
-              setCurrentUser({ ...currentUser, lastName: e.target.value })
+              setCurrentUser({ ...currentUser, last_name: e.target.value })
             }
           />
           <TextField
@@ -304,14 +182,6 @@ export default function Users() {
             }
           />
           <TextField
-            label="Age"
-            type="number"
-            value={currentUser?.age || ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, age: e.target.value })
-            }
-          />
-          <TextField
             label="Status"
             value={currentUser?.status || ""}
             onChange={(e) =>
@@ -319,26 +189,10 @@ export default function Users() {
             }
           />
           <TextField
-            label="Created On"
-            type="date"
-            value={currentUser?.createdOn || ""}
+            label="Role"
+            value={currentUser?.role || ""}
             onChange={(e) =>
-              setCurrentUser({ ...currentUser, createdOn: e.target.value })
-            }
-          />
-          <TextField
-            label="Updated On"
-            type="date"
-            value={currentUser?.updatedOn || ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, updatedOn: e.target.value })
-            }
-          />
-          <TextField
-            label="Country"
-            value={currentUser?.country || ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, country: e.target.value })
+              setCurrentUser({ ...currentUser, role: e.target.value })
             }
           />
         </DialogContent>
