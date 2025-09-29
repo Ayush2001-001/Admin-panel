@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Cookies from "js-cookie";
+
 import {
   Box,
   Table,
@@ -20,185 +22,133 @@ import {
   IconButton,
 } from "@mui/material";
 import Image from "next/image";
-import { Business } from "@mui/icons-material";
 
-export default function Users() {
-  const [users, setUsers] = useState([
-    {
-      id: 1,
-      firstName: "John",
-      lastName: "Doe",
-      email: "john@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Australia",
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 2,
-      firstName: "Jane",
-      lastName: "Smith",
-      email: "jane@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "America",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 3,
-      firstName: "Michael",
-      lastName: "Johnson",
-      email: "michael@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Ireland",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 4,
-      firstName: "Emma",
-      lastName: "Brown",
-      email: "emma@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Canada",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 5,
-      firstName: "Liam",
-      lastName: "Davis",
-      email: "liam@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "UK",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 6,
-      firstName: "Olivia",
-      lastName: "Miller",
-      email: "olivia@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Germany",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 7,
-      firstName: "Noah",
-      lastName: "Wilson",
-      email: "noah@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "France",
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 8,
-      firstName: "Sophia",
-      lastName: "Taylor",
-      email: "sophia@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Spain",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 9,
-      firstName: "James",
-      lastName: "Anderson",
-      email: "james@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Italy",
-
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-    {
-      id: 10,
-      firstName: "Isabella",
-      lastName: "Thomas",
-      email: "isabella@example.com",
-      designation: "xyz",
-      company: "tothebyte",
-      business: "xyz",
-      country: "Japan",
-      createdAt: "2025-08-20",
-      updatedAt: "2025-09-10",
-      status: "Active",
-    },
-  ]);
-
-  const today = () => new Date().toISOString().split("T")[0];
-
-  const initialNewUser = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    designation: "",
-    company: "",
-    country: "",
-    createdAt: "",
-    updatedAt: "",
-    status: "Active",
-  };
-
+export default function contacts() {
+  const [contacts, setcontacts] = useState([]);
   const [open, setOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [countryFilter, setCountryFilter] = useState("All");
-  const [currentUser, setCurrentUser] = useState(null);
-  const [newUser, setNewUser] = useState(initialNewUser);
   const [designationFilter, setDesignationFilter] = useState(null);
   const [companyFilter, setCompanyFilter] = useState(null);
   const [businessFilter, setBusinessFilter] = useState(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const countries = ["All", ...new Set(users.map((u) => u.country))];
-  const designation = ["All", ...new Set(users.map((u) => u.designation))];
-  const Company = ["All", ...new Set(users.map((u) => u.company))];
-  const business = ["All", ...new Set(users.map((u) => u.business))];
+  const [newContact, setnewContact] = useState({
+    first_name: "",
+    last_name: "",
+    email: "",
+    designation: "",
+    company: "",
+    business: "",
+    country: "",
+    phone: "",
+  });
 
-  const filteredUsers = users.filter((user) => {
+  const token = "YOUR_TOKEN";
+
+  const fetchContacts = async () => {
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_contacts/?skip=0&limit=50`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            accept: "application/json",
+          },
+        }
+      );
+      const data = await res.json();
+      if (data.success) setcontacts(data.data || []);
+    } catch (err) {
+      console.error("Error fetching contacts:", err);
+    }
+  };
+
+  const handleAddContact = async () => {
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_contacts/`,
+        {
+          method: "POST",
+          headers: {
+            accept: "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+          body: JSON.stringify(newContact),
+        }
+      );
+      setnewContact({   
+        first_name: "",
+        last_name: "",
+        email: "",
+        designation: "",
+        company: "",
+        business: "",
+        country: "",
+        phone: "",
+      });
+      setAddOpen(false);
+      fetchContacts();
+    } catch (err) {
+      console.error("Error adding contact:", err);
+    }
+  };
+
+  const updateContact = async () => {
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_contacts/${currentUser.id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            accept: "application/json",
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+          body: JSON.stringify(currentUser),
+        }
+      );
+      setOpen(false);
+      fetchContacts();
+    } catch (err) {
+      console.error("Error updating contact:", err);
+    }
+  };
+
+  const deleteContact = async (id) => {
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_contacts/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+            accept: "application/json",
+          },
+        }
+      );
+
+      fetchContacts();
+    } catch (err) {
+      console.error("Error deleting contact:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchContacts();
+  }, []);
+
+  const filteredcontacts = contacts.filter((user) => {
     const matchesSearch = Object.values(user)
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase());
+
     const matchesCountry =
       countryFilter === "All" || user.country === countryFilter;
+
     const matchesDesignation =
       !designationFilter ||
       designationFilter === "All" ||
@@ -213,74 +163,52 @@ export default function Users() {
       !businessFilter ||
       businessFilter === "All" ||
       user.business === businessFilter;
-    return matchesSearch && matchesCountry;
-    matchesDesignation && matchesCompany && matchesBusiness;
+
+    return (
+      matchesSearch &&
+      matchesCountry &&
+      matchesDesignation &&
+      matchesCompany &&
+      matchesBusiness
+    );
   });
 
-  const handleEdit = (user) => {
-    setCurrentUser(user);
-    setOpen(true);
-  };
+  const filteredUsers = contacts.filter((u) => {
+    const matchesSearch = Object.values(u)
+      .join(" ")
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    return matchesSearch;
+  });
 
-  const handleSave = () => {
-    if (!currentUser) return;
-    const updatedUser = { ...currentUser, updatedAt: today() };
-    setUsers(users.map((u) => (u.id === updatedUser.id ? updatedUser : u)));
-    setOpen(false);
-  };
-
-  const handleDelete = (id) => {
-    setUsers(users.filter((u) => u.id !== id));
-  };
-
-  const handleAddUser = () => {
-    if (!newUser.firstName || !newUser.email) return;
-    const nextId = users.length ? Math.max(...users.map((u) => u.id)) + 1 : 1;
-    const newEntry = {
-      id: nextId,
-      firstName: newUser.firstName,
-      lastName: newUser.lastName || "",
-      email: newUser.email,
-      designation: newUser.designation || "",
-      company: newUser.company || "",
-      business: newUser.business || "",
-
-      country: newUser.country || "",
-      createdAt: newUser.createdAt || today(),
-      updatedAt: newUser.updatedAt || today(),
-      status: newUser.status || "Active",
-    };
-    setUsers([...users, newEntry]);
-    setNewUser(initialNewUser);
-    setAddOpen(false);
-  };
+  const countries = ["All", ...new Set(contacts.map((u) => u.country))];
+  const designations = ["All", ...new Set(contacts.map((u) => u.designation))];
+  const companies = ["All", ...new Set(contacts.map((u) => u.company))];
+  const businesses = ["All", ...new Set(contacts.map((u) => u.business))];
 
   return (
     <Box>
-      <Box sx={{ display: "flex", flexDirection: "row" ,gap:2}}>
+      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
         <Typography sx={{ fontSize: 25, fontWeight: "bold", mb: 2, mt: 1 }}>
-          Lead contact
+          Lead Contacts
         </Typography>
-           <Button
+        <Button
           variant="contained"
-           sx={{ marginLeft: 77, width:150, height: 40 }}
+          sx={{ marginLeft: "auto", width: 150, height: 35 }}
+          onClick={() => setAddOpen(true)}
         >
-        Import
+          Add Contact
         </Button>
         <Button
           variant="contained"
-          sx={{ width:150, height: 40 }}
-          onClick={() => setAddOpen(true)}
+          sx={{ marginLeft: "auto", width: 150, height: 35 }}
         >
-          Add Contacts
+          Import
         </Button>
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <Typography
-          variant="body1"
-          sx={{ textAlign: "start", fontWeight: "bold" }}
-        >
+        <Typography variant="body1">
           Total result: {filteredUsers.length}
         </Typography>
         <TextField
@@ -289,51 +217,40 @@ export default function Users() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-
         <Autocomplete
           size="small"
-          options={designation}
-          value={newUser.designation || "All"}
-          onChange={(e, newValue) =>
-            setNewUser({ ...newUser, designation: newValue })
-          }
+          options={designations}
+          value={designationFilter || "All"}
+          onChange={(e, v) => setDesignationFilter(v)}
           renderInput={(params) => (
             <TextField {...params} label="Designation" />
           )}
-          sx={{ minWidth:140}}
+          sx={{ minWidth: 140 }}
         />
-
         <Autocomplete
           size="small"
-          options={Company}
-          value={newUser.company || "All"}
-          onChange={(e, newValue) =>
-            setNewUser({ ...newUser, company: newValue })
-          }
+          options={companies}
+          value={companyFilter || "All"}
+          onChange={(e, v) => setCompanyFilter(v)}
           renderInput={(params) => <TextField {...params} label="Company" />}
-          sx={{ minWidth:140}}
+          sx={{ minWidth: 140 }}
         />
-
         <Autocomplete
           size="small"
-          options={business}
-          value={newUser.business || "All"}
-          onChange={(e, newValue) =>
-            setNewUser({ ...newUser, business: newValue })
-          }
+          options={businesses}
+          value={businessFilter || "All"}
+          onChange={(e, v) => setBusinessFilter(v)}
           renderInput={(params) => <TextField {...params} label="Business" />}
-          sx={{ minWidth:140}}
+          sx={{ minWidth: 140 }}
         />
         <Autocomplete
           size="small"
           options={countries}
           value={countryFilter}
-          onChange={(e, newValue) => setCountryFilter(newValue || "All")}
+          onChange={(e, v) => setCountryFilter(v || "All")}
           renderInput={(params) => <TextField {...params} label="Country" />}
-          sx={{ minWidth:140}}
+          sx={{ minWidth: 140 }}
         />
-
-        <Button variant="contained">Search</Button>
       </Box>
 
       <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
@@ -344,88 +261,56 @@ export default function Users() {
                 "& th": {
                   backgroundColor: "primary.main",
                   color: "white",
-                  fontSize: 12,
-                  // padding: "6px 10px",
+                  fontSize: 11,
+                  padding: "6px 10px",
+                  fontWeight: "bold",
                 },
               }}
             >
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                ID
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                First Name
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Last Name
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Email
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Designation
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Company
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Business
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Country
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Created At
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Updated At
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Status
-              </TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>
-                Actions
-              </TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>First Name</TableCell>
+              <TableCell>Last Name</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Designation</TableCell>
+              <TableCell>Company</TableCell>
+              <TableCell>Business</TableCell>
+              <TableCell>Country</TableCell>
+              <TableCell>Phone</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Is Verified</TableCell>
+              <TableCell>Created At</TableCell>
+              <TableCell>Updated At</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredUsers.map((user) => (
+            {filteredcontacts.map((user) => (
               <TableRow key={user.id} hover>
-                <TableCell sx={{ padding: "6px 8px" }}>{user.id}</TableCell>
-                <TableCell sx={{ padding: "6px 8px" }}>
-                  {user.firstName}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.lastName}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>{user.email}</TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.designation}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.company}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.business}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.country}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.createdAt}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.updatedAt}
-                </TableCell>
-                <TableCell sx={{padding: '4px 8px', fontSize: '0.8rem' }}>
-                  {user.status}
-                </TableCell>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.first_name}</TableCell>
+                <TableCell>{user.last_name}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.designation}</TableCell>
+                <TableCell>{user.company}</TableCell>
+                <TableCell>{user.business}</TableCell>
+                <TableCell>{user.country}</TableCell>
+                <TableCell>{user.phone}</TableCell>
+                <TableCell>{user.status}</TableCell>
+                <TableCell>{user.is_verified ? "Yes" : "No"}</TableCell>
+                <TableCell>{user.created_at}</TableCell>
+                <TableCell>{user.updated_at}</TableCell>
                 <TableCell>
-                  <IconButton onClick={() => handleEdit(user)}>
+                  <IconButton
+                    onClick={() => {
+                      setCurrentUser(user);
+                      setOpen(true);
+                    }}
+                  >
                     <Image src="/edit.svg" alt="Edit" width={15} height={15} />
                   </IconButton>
                   <IconButton
                     color="error"
-                    onClick={() => handleDelete(user.id)}
+                    onClick={() => deleteContact(user.id)}
                   >
                     <Image
                       src="/delete.svg"
@@ -442,25 +327,24 @@ export default function Users() {
       </TableContainer>
 
       <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Edit User</DialogTitle>
+        <DialogTitle>Edit Contact</DialogTitle>
         <DialogContent>
           {currentUser && (
             <Box
-              component="form"
               sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
             >
               <TextField
                 label="First Name"
-                value={currentUser.firstName}
+                value={currentUser.first_name}
                 onChange={(e) =>
-                  setCurrentUser({ ...currentUser, firstName: e.target.value })
+                  setCurrentUser({ ...currentUser, first_name: e.target.value })
                 }
               />
               <TextField
                 label="Last Name"
-                value={currentUser.lastName}
+                value={currentUser.last_name}
                 onChange={(e) =>
-                  setCurrentUser({ ...currentUser, lastName: e.target.value })
+                  setCurrentUser({ ...currentUser, last_name: e.target.value })
                 }
               />
               <TextField
@@ -501,86 +385,107 @@ export default function Users() {
                   setCurrentUser({ ...currentUser, country: e.target.value })
                 }
               />
+              <TextField
+                label="Phone"
+                value={currentUser.phone}
+                onChange={(e) =>
+                  setCurrentUser({ ...currentUser, phone: e.target.value })
+                }
+              />
             </Box>
           )}
         </DialogContent>
-        <TableCell>
-          <IconButton onClick={() => handleEdit(user)}>
-            <Image src="/edit.svg" alt="Edit" width={15} height={15} />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDelete(user.id)}>
-            <Image src="/delete.svg" alt="Delete" width={15} height={15} />
-          </IconButton>
-        </TableCell>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>Cancel</Button>
+          <Button onClick={updateContact} variant="contained">
+            Save
+          </Button>
+        </DialogActions>
       </Dialog>
 
       <Dialog open={addOpen} onClose={() => setAddOpen(false)}>
         <DialogTitle>Add Contact</DialogTitle>
         <DialogContent>
-          <Box
-            component="form"
-            sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1,width:500 }}
-          >
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
             <TextField
               label="First Name"
-              value={newUser.firstName}
+              value={newContact.first_name}
               onChange={(e) =>
-                setNewUser({ ...newUser, firstName: e.target.value })
+                setnewContact({ ...newContact, first_name: e.target.value })
               }
             />
             <TextField
               label="Last Name"
-              value={newUser.lastName}
+              value={newContact.last_name}
               onChange={(e) =>
-                setNewUser({ ...newUser, lastName: e.target.value })
+                setnewContact({ ...newContact, last_name: e.target.value })
               }
             />
             <TextField
-              label="Email"
-              value={newUser.email}
+              label="email"
+              value={newContact.email}
               onChange={(e) =>
-                setNewUser({ ...newUser, email: e.target.value })
+                setnewContact({ ...newContact, email: e.target.value })
               }
             />
             <Autocomplete
               size="small"
-              options={designation}
+              options={designations}
               value={designationFilter}
-              onChange={(e, newValue) => setDesignationFilter(newValue)}
+              onChange={(e) =>
+                setnewContact({ ...newContact, designation: e.target.value })
+              }
               renderInput={(params) => (
-                <TextField {...params} label="Designation" />
+                <TextField {...params} label="designation" />
               )}
             />
             <Autocomplete
               size="small"
-              options={Company}
+              options={companies}
               value={companyFilter}
-              onChange={(e, newValue) => setCompanyFilter(newValue)}
+              onChange={(e) =>
+                setnewContact({ ...newContact, company: e.target.value })
+              }
               renderInput={(params) => (
-                <TextField {...params} label="Company" />
+                <TextField {...params} label="company" />
               )}
             />
             <Autocomplete
               size="small"
-              options={business}
+              options={businesses}
               value={businessFilter}
-              onChange={(e, newValue) => setBusinessFilter(newValue)}
+              onChange={(e) =>
+                setnewContact({ ...newContact, business: e.target.value })
+              }
               renderInput={(params) => (
-                <TextField {...params} label="Business" />
+                <TextField {...params} label="business" />
+              )}
+            />
+            <Autocomplete
+              size="small"
+              options={countries}
+              value={countryFilter}
+              onChange={(e) =>
+                setnewContact({ ...newContact, country: e.target.value })
+              }
+              renderInput={(params) => (
+                <TextField {...params} label="country" />
               )}
             />
             <TextField
-              label="Country"
-              value={newUser.country}
+              label="phone"
+              value={newContact.phone}
               onChange={(e) =>
-                setNewUser({ ...newUser, country: e.target.value })
+                setnewContact({ ...newContact, phone: e.target.value })
               }
             />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button variant="contained" onClick={() => setAddOpen(false)}>Cancel</Button>
-          <Button variant="contained" onClick={handleAddUser}>Add Contact</Button>
+          <Button onClick={() => setAddOpen(false)}>Cancel</Button>
+          <Button onClick={handleAddContact} variant="contained">
+            Add
+          </Button>
         </DialogActions>
       </Dialog>
     </Box>
