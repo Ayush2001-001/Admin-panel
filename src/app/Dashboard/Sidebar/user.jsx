@@ -26,13 +26,12 @@ export default function Users() {
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
-  const [countryFilter, setCountryFilter] = useState("All");
   const [currentUser, setCurrentUser] = useState(null);
 
   useEffect(() => {
     const user = async () => {
       try {
-        const res = await fetch("http://13.55.191.127:8000/api/users/me/", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/me/`, {
           headers: {
             accept: "application/json",
             Authorization: `Bearer ${Cookies.get("token")}`,
@@ -48,16 +47,12 @@ export default function Users() {
     user();
   }, []);
 
-  const countries = ["All", ...new Set(users.map((u) => u.country || ""))];
-
   const filteredUsers = users.filter((u) => {
     const matchesSearch = Object.values(u)
       .join(" ")
       .toLowerCase()
       .includes(search.toLowerCase());
-    const matchesCountry =
-      countryFilter === "All" || u.country === countryFilter;
-    return matchesSearch && matchesCountry;
+    return matchesSearch;
   });
 
   const handleEdit = (user) => {
@@ -70,9 +65,9 @@ export default function Users() {
     setOpen(false);
   };
 
-  const handleDelete = (id) => {
-    setUsers(users.filter((u) => u.id !== id));
-  };
+  // const handleDelete = (id) => {
+  //   setUsers(users.filter((u) => u.id !== id));
+  // };
 
   return (
     <Box>
@@ -90,15 +85,8 @@ export default function Users() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Autocomplete
-          size="small"
-          options={countries}
-          value={countryFilter}
-          onChange={(e, newValue) => setCountryFilter(newValue || "All")}
-          renderInput={(params) => <TextField {...params} label="Country" />}
-          sx={{ minWidth: 200 }}
-        />
-        <Button variant="contained">Submit</Button>
+        <Button variant="contained">Search</Button>
+        <Button variant="contained">Reset</Button>
       </Box>
 
       <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
@@ -134,14 +122,14 @@ export default function Users() {
                   <IconButton onClick={() => handleEdit(u)}>
                     <Image src="/edit.svg" alt="Edit" width={15} height={15} />
                   </IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(u.id)}>
+                  {/* <IconButton color="error" onClick={() => handleDelete(u.id)}>
                     <Image
                       src="/delete.svg"
                       alt="Delete"
                       width={15}
                       height={15}
                     />
-                  </IconButton>
+                  </IconButton> */}
                 </TableCell>
               </TableRow>
             ))}
@@ -173,28 +161,7 @@ export default function Users() {
             onChange={(e) =>
               setCurrentUser({ ...currentUser, last_name: e.target.value })
             }
-          />
-          <TextField
-            label="Email"
-            value={currentUser?.email || ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, email: e.target.value })
-            }
-          />
-          <TextField
-            label="Status"
-            value={currentUser?.status || ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, status: e.target.value })
-            }
-          />
-          <TextField
-            label="Role"
-            value={currentUser?.role || ""}
-            onChange={(e) =>
-              setCurrentUser({ ...currentUser, role: e.target.value })
-            }
-          />
+          />  
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
