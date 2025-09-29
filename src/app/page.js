@@ -1,6 +1,5 @@
-import Image from "next/image";
-import styles from "./page.module.css";
-import SignIn from "./signIn/page"
+
+import SignIn from "./components/page"
 export default function Home() {
   return (
    <div>

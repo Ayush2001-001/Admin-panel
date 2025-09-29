@@ -1,8 +1,8 @@
 "use client";
 import { Box, Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
 import Navbar from "./Navbar/page";
-import Users from "./Sidebar/User";
-import LeadContact from "./Sidebar/LeadContact";
+import Users from "./Sidebar/user";
+import LeadContact from "./Sidebar/leadContact";
 import LeadCampaigns from "./Sidebar/LeadCampaigns";
 import EmailQueues from "./Sidebar/EmailQues";
 import Templates from "./Sidebar/Templates";
