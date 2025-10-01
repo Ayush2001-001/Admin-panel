@@ -47,6 +47,31 @@ export default function contacts() {
 
   const token = "YOUR_TOKEN";
 
+  const handleImport = async (file) => {
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_contacts/import`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${Cookies.get("token")}`,
+          },
+          body: formData,
+        }
+      );
+
+      const data = await res.json();
+      if (data.success) fetchContacts();
+    } catch (err) {
+      console.error("Error importing contacts:", err);
+    }
+  };
+
   const fetchContacts = async () => {
     try {
       const res = await fetch(
@@ -62,7 +87,7 @@ export default function contacts() {
       const data = await res.json();
       if (data.success) setcontacts(data.data || []);
     } catch (err) {
-      console.error("Error fetching contacts:", err);
+      console.log("Error fetching contacts:", err);
     }
   };
 
@@ -73,13 +98,15 @@ export default function contacts() {
         {
           method: "POST",
           headers: {
+            "Content-Type": "application/json",
             accept: "application/json",
             Authorization: `Bearer ${Cookies.get("token")}`,
           },
           body: JSON.stringify(newContact),
         }
       );
-      setnewContact({   
+
+      setnewContact({
         first_name: "",
         last_name: "",
         email: "",
@@ -90,7 +117,6 @@ export default function contacts() {
         phone: "",
       });
       setAddOpen(false);
-      fetchContacts();
     } catch (err) {
       console.error("Error adding contact:", err);
     }
@@ -111,7 +137,6 @@ export default function contacts() {
         }
       );
       setOpen(false);
-      fetchContacts();
     } catch (err) {
       console.error("Error updating contact:", err);
     }
@@ -129,8 +154,7 @@ export default function contacts() {
           },
         }
       );
-
-      fetchContacts();
+      alert("Are you sure want to delete");
     } catch (err) {
       console.error("Error deleting contact:", err);
     }
@@ -188,23 +212,30 @@ export default function contacts() {
 
   return (
     <Box>
-      <Box sx={{ display: "flex", flexDirection: "row", gap: 2 }}>
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
         <Typography sx={{ fontSize: 25, fontWeight: "bold", mb: 2, mt: 1 }}>
           Lead Contacts
         </Typography>
-        <Button
+        <IconButton
           variant="contained"
-          sx={{ marginLeft: "auto", width: 150, height: 35 }}
+          sx={{ marginLeft: 80, width: 150, height: 35 }}
           onClick={() => setAddOpen(true)}
         >
-          Add Contact
-        </Button>
-        <Button
+          <Image src="/add.svg" alt="Add" width={30} height={30} />
+        </IconButton>
+        <IconButton
           variant="contained"
-          sx={{ marginLeft: "auto", width: 150, height: 35 }}
+          component="label"
+          sx={{ width: 150, height: 35 }}
         >
-          Import
-        </Button>
+          <input
+            type="file"
+            hidden
+            accept=".csv"
+            onChange={(e) => handleImport(e.target.files[0])}
+          />
+          <Image src="/import.svg" alt="Import" width={30} height={30} />
+        </IconButton>
       </Box>
 
       <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
@@ -221,7 +252,7 @@ export default function contacts() {
           size="small"
           options={designations}
           value={designationFilter || "All"}
-          onChange={(e, v) => setDesignationFilter(v)}
+          onChange={(_e, v) => setDesignationFilter(v)}
           renderInput={(params) => (
             <TextField {...params} label="Designation" />
           )}
@@ -231,7 +262,7 @@ export default function contacts() {
           size="small"
           options={companies}
           value={companyFilter || "All"}
-          onChange={(e, v) => setCompanyFilter(v)}
+          onChange={(_e, v) => setCompanyFilter(v)}
           renderInput={(params) => <TextField {...params} label="Company" />}
           sx={{ minWidth: 140 }}
         />
@@ -239,7 +270,7 @@ export default function contacts() {
           size="small"
           options={businesses}
           value={businessFilter || "All"}
-          onChange={(e, v) => setBusinessFilter(v)}
+          onChange={(_e, v) => setBusinessFilter(v)}
           renderInput={(params) => <TextField {...params} label="Business" />}
           sx={{ minWidth: 140 }}
         />
@@ -247,7 +278,7 @@ export default function contacts() {
           size="small"
           options={countries}
           value={countryFilter}
-          onChange={(e, v) => setCountryFilter(v || "All")}
+          onChange={(_e, v) => setCountryFilter(v || "All")}
           renderInput={(params) => <TextField {...params} label="Country" />}
           sx={{ minWidth: 140 }}
         />
@@ -261,9 +292,9 @@ export default function contacts() {
                 "& th": {
                   backgroundColor: "primary.main",
                   color: "white",
-                  fontSize: 11,
-                  padding: "6px 10px",
+                  fontSize: 10,
                   fontWeight: "bold",
+                  padding: "2px 12px",
                 },
               }}
             >
@@ -422,58 +453,63 @@ export default function contacts() {
               }
             />
             <TextField
-              label="email"
+              label="Email"
               value={newContact.email}
               onChange={(e) =>
                 setnewContact({ ...newContact, email: e.target.value })
               }
             />
+
             <Autocomplete
               size="small"
               options={designations}
-              value={designationFilter}
-              onChange={(e) =>
-                setnewContact({ ...newContact, designation: e.target.value })
+              value={newContact.designation}
+              onChange={(_e, v) =>
+                setnewContact({ ...newContact, designation: v || "" })
               }
               renderInput={(params) => (
-                <TextField {...params} label="designation" />
+                <TextField {...params} label="Designation" />
               )}
             />
+
             <Autocomplete
               size="small"
               options={companies}
-              value={companyFilter}
-              onChange={(e) =>
-                setnewContact({ ...newContact, company: e.target.value })
+              value={newContact.company}
+              onChange={(_e, v) =>
+                setnewContact({ ...newContact, company: v || "" })
               }
               renderInput={(params) => (
-                <TextField {...params} label="company" />
+                <TextField {...params} label="Company" />
               )}
             />
+
             <Autocomplete
               size="small"
               options={businesses}
-              value={businessFilter}
-              onChange={(e) =>
-                setnewContact({ ...newContact, business: e.target.value })
+              value={newContact.business}
+              onChange={(_e, v) =>
+                setnewContact({ ...newContact, business: v || "" })
               }
               renderInput={(params) => (
-                <TextField {...params} label="business" />
+                <TextField {...params} label="Business" />
               )}
             />
+
             <Autocomplete
               size="small"
               options={countries}
-              value={countryFilter}
-              onChange={(e) =>
-                setnewContact({ ...newContact, country: e.target.value })
+              value={newContact.country}
+              onChange={(_e, v) =>
+                setnewContact({ ...newContact, country: v || "" })
               }
               renderInput={(params) => (
-                <TextField {...params} label="country" />
+                <TextField {...params} label="Country" />
               )}
             />
+
             <TextField
-              label="phone"
+              label="Phone"
               value={newContact.phone}
               onChange={(e) =>
                 setnewContact({ ...newContact, phone: e.target.value })
