@@ -51,7 +51,6 @@ export default function EmailQueues() {
         const json = await res.json();
         console.log("API Response:", json);
 
-        // Set data safely
         setData(json.data || []);
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -61,7 +60,6 @@ export default function EmailQueues() {
     fetchData();
   }, []);
 
-  // Filters
   const countries = ["All", ...new Set(data.map((i) => i.country))];
   const designations = ["All", ...new Set(data.map((i) => i.designation))];
   const companies = ["All", ...new Set(data.map((i) => i.company))];
@@ -98,7 +96,6 @@ export default function EmailQueues() {
 
   return (
     <Box sx={{ p: 2 }}>
-      {/* Title */}
       <Typography
         variant="h6"
         sx={{
@@ -111,7 +108,6 @@ export default function EmailQueues() {
         Email Queues
       </Typography>
 
-      {/* Filters */}
       <Box
         sx={{
           display: "flex",
@@ -167,7 +163,6 @@ export default function EmailQueues() {
         />
       </Box>
 
-      {/* Table */}
       <Paper sx={{ borderRadius: 2, boxShadow: 2 }}>
         <TableContainer sx={{ maxHeight: 480 }}>
           <Table stickyHeader size="small">

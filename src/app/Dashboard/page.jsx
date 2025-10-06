@@ -62,7 +62,6 @@ export default function Dashboard() {
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
 
-      {/* ✅ AppBar */}
       <AppBar
         position="fixed"
         sx={{
@@ -72,7 +71,6 @@ export default function Dashboard() {
         }}
       >
         <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          {/* Left: Toggle + Title */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
             <IconButton
               color="inherit"
@@ -103,7 +101,6 @@ export default function Dashboard() {
         </Toolbar>
       </AppBar>
 
-      {/* ✅ Collapsible Drawer */}
       <Drawer
         variant="permanent"
         open={open}
@@ -124,7 +121,6 @@ export default function Dashboard() {
         <Toolbar />
         <Divider />
 
-        {/* Menu List */}
         <List>
           {menu.map((item) => (
             <Tooltip
@@ -169,13 +165,11 @@ export default function Dashboard() {
         </List>
       </Drawer>
 
-      {/* ✅ Main Content Area */}
       <Box
         component="main"
         sx={{
           flexGrow: 1,
           p: 3,
-          // ml: open ? `${drawerWidth}px` : `${collapsedWidth}px`,
           backgroundColor: "#f9f9f9",
           minHeight: "100vh",
           transition: "margin 0.3s ease",
