@@ -211,319 +211,350 @@ export default function contacts() {
   const businesses = ["All", ...new Set(contacts.map((u) => u.business))];
 
   return (
-    <Box>
-      <Box sx={{ display: "flex", flexDirection: "row" }}>
-        <Typography sx={{ fontSize: 25, fontWeight: "bold", mb: 2, mt: 1 }}>
-          Lead Contacts
-        </Typography>
-        <IconButton
-          variant="contained"
-          sx={{ marginLeft: 80, width: 150, height: 35 }}
-          onClick={() => setAddOpen(true)}
-        >
-          <Image src="/add.svg" alt="Add" width={30} height={30} />
-        </IconButton>
-        <IconButton
-          variant="contained"
-          component="label"
-          sx={{ width: 150, height: 35 }}
-        >
-          <input
-            type="file"
-            hidden
-            accept=".csv"
-            onChange={(e) => handleImport(e.target.files[0])}
-          />
-          <Image src="/import.svg" alt="Import" width={30} height={30} />
-        </IconButton>
-      </Box>
+      <Box sx={{ p: 2 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        mb: 2,
+      }}
+    >
+    <Typography
+      sx={{
+        fontSize: 22,
+        fontWeight: 700,
+        color: "primary.main",
+      }}
+    >
+      Lead Contacts
+    </Typography>
 
-      <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
-        <Typography variant="body1">
-          Total result: {filteredUsers.length}
-        </Typography>
+    <Box sx={{ display: "flex", gap: 1.5 }}>
+      <Button
+        variant="contained"
+        startIcon={<Image src="/add.svg" alt="Add" width={20} height={20} />}
+        onClick={() => setAddOpen(true)}
+        sx={{
+          textTransform: "none",
+          fontSize: 12,
+          height: 36,
+        }}
+      >
+        Add Contact
+      </Button>
+
+      <Button
+        variant="outlined"
+        component="label"
+        startIcon={<Image src="/import.svg" alt="Import" width={20} height={20} />}
+        sx={{
+          textTransform: "none",
+          fontSize: 12,
+          height: 36,
+        }}
+      >
+        Import CSV
+        <input
+          type="file"
+          hidden
+          accept=".csv"
+          onChange={(e) => handleImport(e.target.files[0])}
+        />
+      </Button>
+    </Box>
+  </Box>
+
+  <Box
+    sx={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: 1.5,
+      mb: 2,
+      alignItems: "center",
+    }}
+  >
+    <Typography variant="body2" sx={{ fontWeight: 500 }}>
+      Total Results: {filteredUsers.length}
+    </Typography>
+
+    <TextField
+      size="small"
+      label="Search"
+      value={search}
+      onChange={(e) => setSearch(e.target.value)}
+      sx={{ minWidth: 200 }}
+    />
+
+    <Autocomplete
+      size="small"
+      options={designations}
+      value={designationFilter || "All"}
+      onChange={(_e, v) => setDesignationFilter(v)}
+      renderInput={(params) => <TextField {...params} label="Designation" />}
+      sx={{ minWidth: 150 }}
+    />
+
+    <Autocomplete
+      size="small"
+      options={companies}
+      value={companyFilter || "All"}
+      onChange={(_e, v) => setCompanyFilter(v)}
+      renderInput={(params) => <TextField {...params} label="Company" />}
+      sx={{ minWidth: 150 }}
+    />
+
+    <Autocomplete
+      size="small"
+      options={businesses}
+      value={businessFilter || "All"}
+      onChange={(_e, v) => setBusinessFilter(v)}
+      renderInput={(params) => <TextField {...params} label="Business" />}
+      sx={{ minWidth: 150 }}
+    />
+
+    <Autocomplete
+      size="small"
+      options={countries}
+      value={countryFilter || "All"}
+      onChange={(_e, v) => setCountryFilter(v)}
+      renderInput={(params) => <TextField {...params} label="Country" />}
+      sx={{ minWidth: 150 }}
+    />
+  </Box>
+
+  <TableContainer
+    component={Paper}
+    sx={{
+      maxHeight: 420,
+      borderRadius: 2,
+      boxShadow: 1,
+    }}
+  >
+    <Table stickyHeader size="small">
+      <TableHead>
+        <TableRow
+          sx={{
+            "& th": {
+              backgroundColor: "primary.main",
+              color: "#fff",
+              fontSize: 11,
+              fontWeight: 600,
+              padding: "6px 8px",
+              whiteSpace: "nowrap",
+            },
+          }}
+        >
+          <TableCell>ID</TableCell>
+          <TableCell>First Name</TableCell>
+          <TableCell>Last Name</TableCell>
+          <TableCell>Email</TableCell>
+          <TableCell>Designation</TableCell>
+          <TableCell>Company</TableCell>
+          <TableCell>Business</TableCell>
+          <TableCell>Country</TableCell>
+          <TableCell>Phone</TableCell>
+          <TableCell>Status</TableCell>
+          <TableCell>Verified</TableCell>
+          <TableCell>Created At</TableCell>
+          <TableCell>Updated At</TableCell>
+          <TableCell align="center">Actions</TableCell>
+        </TableRow>
+      </TableHead>
+
+      <TableBody>
+        {filteredcontacts.map((user) => (
+          <TableRow
+            key={user.id}
+            hover
+            sx={{
+              "&:hover": { backgroundColor: "#f4f9ff" },
+            }}
+          >
+            <TableCell sx={{ fontSize: 11 }}>{user.id}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.first_name}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.last_name}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.email}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.designation}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.company}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.business}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.country}</TableCell>
+            <TableCell sx={{ fontSize: 11 }}>{user.phone}</TableCell>
+            <TableCell
+              sx={{
+                fontSize: 11,
+                color: user.status === "Active" ? "green" : "red",
+                fontWeight: 600,
+              }}
+            >
+              {user.status}
+            </TableCell>
+            <TableCell sx={{ fontSize: 11 }}>
+              {user.is_verified ? "Yes" : "No"}
+            </TableCell>
+            <TableCell sx={{ fontSize: 11 }}>
+              {new Date(user.created_at).toLocaleString()}
+            </TableCell>
+            <TableCell sx={{ fontSize: 11 }}>
+              {new Date(user.updated_at).toLocaleString()}
+            </TableCell>
+            <TableCell align="center">
+              <IconButton
+                size="small"
+                color="primary"
+                onClick={() => {
+                  setCurrentUser(user);
+                  setOpen(true);
+                }}
+              >
+                <Image src="/edit.svg" alt="Edit" width={16} height={16} />
+              </IconButton>
+              <IconButton
+                size="small"
+                color="error"
+                onClick={() => deleteContact(user.id)}
+              >
+                <Image src="/delete.svg" alt="Delete" width={16} height={16} />
+              </IconButton>
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>
+
+  <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
+    <DialogTitle
+      sx={{ fontWeight: 600, fontSize: 16, color: "primary.main" }}
+    >
+      Edit Contact
+    </DialogTitle>
+    <DialogContent>
+      {currentUser && (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+          {[
+            "first_name",
+            "last_name",
+            "email",
+            "designation",
+            "company",
+            "business",
+            "country",
+            "phone",
+          ].map((field) => (
+            <TextField
+              key={field}
+              label={field.replace("_", " ").replace(/\b\w/g, (c) => c.toUpperCase())}
+              value={currentUser[field]}
+              onChange={(e) =>
+                setCurrentUser({ ...currentUser, [field]: e.target.value })
+              }
+              size="small"
+            />
+          ))}
+        </Box>
+      )}
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setOpen(false)} size="small">
+        Cancel
+      </Button>
+      <Button variant="contained" size="small" onClick={updateContact}>
+        Save
+      </Button>
+    </DialogActions>
+  </Dialog>
+
+  <Dialog open={addOpen} onClose={() => setAddOpen(false)} maxWidth="xs" fullWidth>
+    <DialogTitle
+      sx={{ fontWeight: 600, fontSize: 16, color: "primary.main" }}
+    >
+      Add Contact
+    </DialogTitle>
+    <DialogContent>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
         <TextField
           size="small"
-          label="Search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
+          label="First Name"
+          value={newContact.first_name}
+          onChange={(e) =>
+            setnewContact({ ...newContact, first_name: e.target.value })
+          }
+        />
+        <TextField
+          size="small"
+          label="Last Name"
+          value={newContact.last_name}
+          onChange={(e) =>
+            setnewContact({ ...newContact, last_name: e.target.value })
+          }
+        />
+        <TextField
+          size="small"
+          label="Email"
+          value={newContact.email}
+          onChange={(e) =>
+            setnewContact({ ...newContact, email: e.target.value })
+          }
         />
         <Autocomplete
           size="small"
           options={designations}
-          value={designationFilter || "All"}
-          onChange={(_e, v) => setDesignationFilter(v)}
+          value={newContact.designation}
+          onChange={(_e, v) =>
+            setnewContact({ ...newContact, designation: v || "" })
+          }
           renderInput={(params) => (
             <TextField {...params} label="Designation" />
           )}
-          sx={{ minWidth: 140 }}
         />
         <Autocomplete
           size="small"
           options={companies}
-          value={companyFilter || "All"}
-          onChange={(_e, v) => setCompanyFilter(v)}
+          value={newContact.company}
+          onChange={(_e, v) =>
+            setnewContact({ ...newContact, company: v || "" })
+          }
           renderInput={(params) => <TextField {...params} label="Company" />}
-          sx={{ minWidth: 140 }}
         />
         <Autocomplete
           size="small"
           options={businesses}
-          value={businessFilter || "All"}
-          onChange={(_e, v) => setBusinessFilter(v)}
+          value={newContact.business}
+          onChange={(_e, v) =>
+            setnewContact({ ...newContact, business: v || "" })
+          }
           renderInput={(params) => <TextField {...params} label="Business" />}
-          sx={{ minWidth: 140 }}
         />
         <Autocomplete
           size="small"
           options={countries}
-          value={countryFilter}
-          onChange={(_e, v) => setCountryFilter(v || "All")}
+          value={newContact.country}
+          onChange={(_e, v) =>
+            setnewContact({ ...newContact, country: v || "" })
+          }
           renderInput={(params) => <TextField {...params} label="Country" />}
-          sx={{ minWidth: 140 }}
+        />
+        <TextField
+          size="small"
+          label="Phone"
+          value={newContact.phone}
+          onChange={(e) =>
+            setnewContact({ ...newContact, phone: e.target.value })
+          }
         />
       </Box>
+    </DialogContent>
+    <DialogActions>
+      <Button onClick={() => setAddOpen(false)} size="small">
+        Cancel
+      </Button>
+      <Button variant="contained" size="small" onClick={handleAddContact}>
+        Add
+      </Button>
+    </DialogActions>
+  </Dialog>
+</Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow
-              sx={{
-                "& th": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: 10,
-                  fontWeight: "bold",
-                  padding: "2px 12px",
-                },
-              }}
-            >
-              <TableCell>ID</TableCell>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Designation</TableCell>
-              <TableCell>Company</TableCell>
-              <TableCell>Business</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Phone</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Is Verified</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>Updated At</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredcontacts.map((user) => (
-              <TableRow key={user.id} hover>
-                <TableCell>{user.id}</TableCell>
-                <TableCell>{user.first_name}</TableCell>
-                <TableCell>{user.last_name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.designation}</TableCell>
-                <TableCell>{user.company}</TableCell>
-                <TableCell>{user.business}</TableCell>
-                <TableCell>{user.country}</TableCell>
-                <TableCell>{user.phone}</TableCell>
-                <TableCell>{user.status}</TableCell>
-                <TableCell>{user.is_verified ? "Yes" : "No"}</TableCell>
-                <TableCell>{user.created_at}</TableCell>
-                <TableCell>{user.updated_at}</TableCell>
-                <TableCell>
-                  <IconButton
-                    onClick={() => {
-                      setCurrentUser(user);
-                      setOpen(true);
-                    }}
-                  >
-                    <Image src="/edit.svg" alt="Edit" width={15} height={15} />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => deleteContact(user.id)}
-                  >
-                    <Image
-                      src="/delete.svg"
-                      alt="Delete"
-                      width={15}
-                      height={15}
-                    />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <Dialog open={open} onClose={() => setOpen(false)}>
-        <DialogTitle>Edit Contact</DialogTitle>
-        <DialogContent>
-          {currentUser && (
-            <Box
-              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
-            >
-              <TextField
-                label="First Name"
-                value={currentUser.first_name}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, first_name: e.target.value })
-                }
-              />
-              <TextField
-                label="Last Name"
-                value={currentUser.last_name}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, last_name: e.target.value })
-                }
-              />
-              <TextField
-                label="Email"
-                value={currentUser.email}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, email: e.target.value })
-                }
-              />
-              <TextField
-                label="Designation"
-                value={currentUser.designation}
-                onChange={(e) =>
-                  setCurrentUser({
-                    ...currentUser,
-                    designation: e.target.value,
-                  })
-                }
-              />
-              <TextField
-                label="Company"
-                value={currentUser.company}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, company: e.target.value })
-                }
-              />
-              <TextField
-                label="Business"
-                value={currentUser.business}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, business: e.target.value })
-                }
-              />
-              <TextField
-                label="Country"
-                value={currentUser.country}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, country: e.target.value })
-                }
-              />
-              <TextField
-                label="Phone"
-                value={currentUser.phone}
-                onChange={(e) =>
-                  setCurrentUser({ ...currentUser, phone: e.target.value })
-                }
-              />
-            </Box>
-          )}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={updateContact} variant="contained">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={addOpen} onClose={() => setAddOpen(false)}>
-        <DialogTitle>Add Contact</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
-            <TextField
-              label="First Name"
-              value={newContact.first_name}
-              onChange={(e) =>
-                setnewContact({ ...newContact, first_name: e.target.value })
-              }
-            />
-            <TextField
-              label="Last Name"
-              value={newContact.last_name}
-              onChange={(e) =>
-                setnewContact({ ...newContact, last_name: e.target.value })
-              }
-            />
-            <TextField
-              label="Email"
-              value={newContact.email}
-              onChange={(e) =>
-                setnewContact({ ...newContact, email: e.target.value })
-              }
-            />
-
-            <Autocomplete
-              size="small"
-              options={designations}
-              value={newContact.designation}
-              onChange={(_e, v) =>
-                setnewContact({ ...newContact, designation: v || "" })
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Designation" />
-              )}
-            />
-
-            <Autocomplete
-              size="small"
-              options={companies}
-              value={newContact.company}
-              onChange={(_e, v) =>
-                setnewContact({ ...newContact, company: v || "" })
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Company" />
-              )}
-            />
-
-            <Autocomplete
-              size="small"
-              options={businesses}
-              value={newContact.business}
-              onChange={(_e, v) =>
-                setnewContact({ ...newContact, business: v || "" })
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Business" />
-              )}
-            />
-
-            <Autocomplete
-              size="small"
-              options={countries}
-              value={newContact.country}
-              onChange={(_e, v) =>
-                setnewContact({ ...newContact, country: v || "" })
-              }
-              renderInput={(params) => (
-                <TextField {...params} label="Country" />
-              )}
-            />
-
-            <TextField
-              label="Phone"
-              value={newContact.phone}
-              onChange={(e) =>
-                setnewContact({ ...newContact, phone: e.target.value })
-              }
-            />
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setAddOpen(false)}>Cancel</Button>
-          <Button onClick={handleAddContact} variant="contained">
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-    </Box>
   );
 }
