@@ -1,8 +1,22 @@
 "use client";
 import { AppBar, Toolbar, Box, Button } from "@mui/material";
 import Image from "next/image";
+import Cookies from "js-cookie";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 
 export default function Navbar() {
+
+    const [isSignIn, setIsSignIn] = useState(false);
+
+    const router = useRouter();
+
+   const handleLogout = () => {
+      Cookies.remove("token");
+      setIsSignIn(false);
+      router.push("/");
+    };
   return (
     <AppBar
       position="fixed"
@@ -28,7 +42,7 @@ export default function Navbar() {
            boxShadow:10,
            
         }}>
-          <Button variant="contained" color="error">
+          <Button  onClick={handleLogout}variant="contained" color="error">
             Logout
           </Button>
         </Box>
