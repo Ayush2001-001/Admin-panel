@@ -102,7 +102,7 @@ export default function LeadCampaigns() {
         setModalOpen={setModalOpen}
         handleDelete={handleDelete}
       />
-
+    
       <Dialog
         open={modalOpen}
         onClose={() => setModalOpen(false)}
