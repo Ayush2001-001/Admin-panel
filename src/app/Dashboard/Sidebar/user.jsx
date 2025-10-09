@@ -1,59 +1,40 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import {
   Box,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  Paper,
-  TableContainer,
+  Typography,
+  TextField,
   Button,
   Dialog,
   DialogTitle,
   DialogContent,
-  TextField,
   DialogActions,
-  Typography,
-  Autocomplete,
-  IconButton,
 } from "@mui/material";
-import Image from "next/image";
-import Cookies from "js-cookie";
+import UsersTable from "../../Table/usersTable";
+import { fetchCurrentUser } from "../../../Api/usersApi";
 
 export default function Users() {
   const [users, setUsers] = useState([]);
   const [open, setOpen] = useState(false);
-  const [search, setSearch] = useState("");
   const [currentUser, setCurrentUser] = useState(null);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
-    const user = async () => {
+    const loadUser = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/users/me/`, {
-          headers: {
-            accept: "application/json",
-            Authorization: `Bearer ${Cookies.get("token")}`,
-          },
-        });
-        const data = await res.json();
-        setUsers([data.data]);
+        const data = await fetchCurrentUser();
+        setUsers(data);
       } catch (err) {
-        console.error("Error fetching user:", err);
+        console.error(err);
       }
     };
-
-    user();
+    loadUser();
   }, []);
 
-  const filteredUsers = users.filter((u) => {
-    const matchesSearch = Object.values(u)
-      .join(" ")
-      .toLowerCase()
-      .includes(search.toLowerCase());
-    return matchesSearch;
-  });
+  const filteredUsers = users.filter((u) =>
+    Object.values(u).join(" ").toLowerCase().includes(search.toLowerCase())
+  );
 
   const handleEdit = (user) => {
     setCurrentUser(user);
@@ -64,10 +45,6 @@ export default function Users() {
     setUsers(users.map((u) => (u.id === currentUser.id ? currentUser : u)));
     setOpen(false);
   };
-
-  // const handleDelete = (id) => {
-  //   setUsers(users.filter((u) => u.id !== id));
-  // };
 
   return (
     <Box>
@@ -89,53 +66,7 @@ export default function Users() {
         <Button variant="contained">Reset</Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 400 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow
-              sx={{
-                "& th": { backgroundColor: "primary.main", color: "white" },
-              }}
-            >
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>ID</TableCell>
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>First Name</TableCell>
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Last Name</TableCell>
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Email</TableCell>
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Role</TableCell>
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Status</TableCell>
-              <TableCell  sx={{ fontWeight: "bold", fontSize: 12 }}>Is Verified</TableCell>
-              <TableCell sx={{ fontWeight: "bold", fontSize: 12 }}>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {filteredUsers.map((u) => (
-              <TableRow key={u.id}>
-                <TableCell sx={{ fontSize: 12 }}>{u.id}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{u.first_name}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{u.last_name}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{u.email}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{u.role}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{u.status}</TableCell>
-                <TableCell sx={{ fontSize: 12 }}>{u.is_verified ? "True" : "False"}</TableCell>
-                <TableCell>
-                  <IconButton onClick={() => handleEdit(u)}>
-                    <Image src="/edit.svg" alt="Edit" width={15} height={15} />
-                  </IconButton>
-                  {/* <IconButton color="error" onClick={() => handleDelete(u.id)}>
-                    <Image
-                      src="/delete.svg"
-                      alt="Delete"
-                      width={15}
-                      height={15}
-                    />
-                  </IconButton> */}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <UsersTable users={filteredUsers} onEdit={handleEdit} />
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Edit User</DialogTitle>
@@ -161,7 +92,7 @@ export default function Users() {
             onChange={(e) =>
               setCurrentUser({ ...currentUser, last_name: e.target.value })
             }
-          />  
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>

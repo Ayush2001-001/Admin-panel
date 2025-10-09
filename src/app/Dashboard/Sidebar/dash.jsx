@@ -9,12 +9,8 @@ import {
   Alert,
   Fade,
 } from "@mui/material";
-import {
-  People,
-  Contacts,
-  Campaign,
-  Email,
-} from "@mui/icons-material";
+import { People, Contacts, Campaign, Email } from "@mui/icons-material";
+import { fetchDashboardData } from "../../../Api/dashboardApi"; 
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
@@ -22,21 +18,13 @@ export default function DashboardPage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await fetch("http://52.65.149.36:8000/api/dashboard", {
-          headers: { accept: "application/json" },
-        });
-        const json = await res.json();
-        if (json.success) setData(json.data);
-        else setError("Failed to load dashboard data.");
-      } catch (err) {
-        setError("Error fetching dashboard data.");
-      } finally {
-        setLoading(false);
-      }
+    const loadDashboard = async () => {
+      const { data, error } = await fetchDashboardData();
+      if (error) setError(error);
+      else setData(data);
+      setLoading(false);
     };
-    fetchData();
+    loadDashboard();
   }, []);
 
   if (loading)
@@ -93,7 +81,7 @@ export default function DashboardPage() {
       </Typography>
 
       <Typography variant="h6" fontWeight="bold" mb={2}>
-        👥 User Summary
+        User Summary
       </Typography>
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} md={3}>
@@ -107,14 +95,14 @@ export default function DashboardPage() {
       </Grid>
 
       <Typography variant="h6" fontWeight="bold" mb={2}>
-        📇 Lead Contacts
+        Lead Contacts
       </Typography>
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} md={3}>
           <StatCard
             title="Total Leads"
-            value={lead_contact.total_lead_contact}
             icon={<Contacts sx={{ fontSize: 40 }} />}
+            value={lead_contact.total_lead_contact}
             gradient="linear-gradient(135deg, #6a1b9a, #9c27b0)"
           />
         </Grid>
@@ -145,7 +133,7 @@ export default function DashboardPage() {
       </Grid>
 
       <Typography variant="h6" fontWeight="bold" mb={2}>
-        🎯 Lead Campaigns
+        Lead Campaigns
       </Typography>
       <Grid container spacing={3} mb={4}>
         <Grid item xs={12} md={4}>
@@ -199,7 +187,7 @@ export default function DashboardPage() {
       </Grid>
 
       <Typography variant="h6" fontWeight="bold" mb={2}>
-        📧 Email Queue
+        Email Queue
       </Typography>
       <Grid container spacing={3}>
         <Grid item xs={12} md={3}>

@@ -2,26 +2,23 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Table,
-  TableHead,
-  TableRow,
-  TableCell,
-  TableBody,
-  TableContainer,
-  Paper,
+  Typography,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
   TextField,
-  Button,
   Autocomplete,
-  Typography,
-  IconButton
 } from "@mui/material";
-import Cookies from "js-cookie";
-import { Try } from "@mui/icons-material";
-import Image from "next/image";
+import LeadCampaignTable from "../../Table/leadCampaignTable";
+import {
+  fetchCampaigns,
+  fetchMeta,
+  saveCampaign,
+  deleteCampaign,
+  updateCampaignStatus,
+} from "../../../Api/leadCampaignApi";
 
 export default function LeadCampaigns() {
   const [campaigns, setCampaigns] = useState([]);
@@ -40,38 +37,6 @@ export default function LeadCampaigns() {
     business: "",
   };
 
-  useEffect(() => {
-    fetchCampaigns();
-    fetchMeta();
-  }, []);
-
-  const fetchCampaigns = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_campaigns/`,
-        {
-          headers: { Authorization: `Bearer ${Cookies.get("token")}` },
-        }
-      );
-      const json = await res.json();
-      setCampaigns(json.data || []);
-    } catch {
-      setCampaigns([]);
-    }
-  };
-
-  const fetchMeta = async () => {
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/metaOptions`
-      );
-      const json = await res.json();
-      setMeta(json.data || {});
-    } catch {
-      setMeta({});
-    }
-  };
-
   const getStatusColor = (status) =>
     ({
       pending: "#FFA500",
@@ -81,71 +46,30 @@ export default function LeadCampaigns() {
       cancelled: "#FF0000",
     }[status] || "black");
 
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setCampaigns(await fetchCampaigns());
+    setMeta(await fetchMeta());
+  };
+
   const handleSave = async () => {
-    const method = editData.id ? "PUT" : "POST";
-    const url = editData.id
-      ? `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_campaigns/${editData.id}`
-      : `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_campaigns/`;
-    try {
-      await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${Cookies.get("token")}`,
-        },
-        body: JSON.stringify(editData),
-      });
-      setModalOpen(false);
-      fetchCampaigns();
-    } catch (err) {
-      console.error(err);
-    }
+    await saveCampaign(editData);
+    setModalOpen(false);
+    loadData();
   };
 
   const handleDelete = async (id) => {
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_campaigns/${id}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${Cookies.get("token")}`,
-            accept: "application/json",
-          },
-        }
-      );
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(
-          `Failed to delete campaign: ${response.status} ${errorText}`
-        );
-      }
-
-      console.log("Campaign deleted successfully");
-    } catch (error) {
-      console.error("Error deleting campaign:", error);
-    }
+    await deleteCampaign(id);
+    loadData();
   };
 
   const updateStatus = async (id, newStatus) => {
-    try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/lead_campaigns/${id}/status`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${Cookies.get("token")}`,
-          },
-          body: JSON.stringify({ status: newStatus }),
-        }
-      );
-      setStatusPopup(null);
-      fetchCampaigns();
-    } catch (err) {
-      console.error(err);
-    }
+    await updateCampaignStatus(id, newStatus);
+    setStatusPopup(null);
+    loadData();
   };
 
   return (
@@ -170,114 +94,14 @@ export default function LeadCampaigns() {
         </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 500 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow
-              sx={{
-                "& th": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                  fontSize: 10,
-                  fontWeight: "bold",
-                  padding: "2px 12px",
-                },
-              }}
-            >
-              <TableCell>Id</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Total Queued</TableCell>
-              <TableCell>Total Active</TableCell>
-              <TableCell>Total Sent</TableCell>
-              <TableCell>Total Failed</TableCell>
-              <TableCell>Company</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Created At</TableCell>
-              <TableCell>Updated At</TableCell>
-              <TableCell>Action</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {campaigns.length === 0 ? (
-              <TableRow>
-                {/* <TableCell colSpan={5} align="center">
-                  No campaigns found
-                </TableCell> */}
-              </TableRow>
-            ) : (
-              campaigns.map((c) => (
-                <TableRow key={c.id} hover>
-                  <TableCell>{c.id}</TableCell>
-                  <TableCell>{c.title}</TableCell>
-                  <TableCell>{c.description}</TableCell>
-                  <TableCell
-                    style={{
-                      color: "white",
-                      backgroundColor: getStatusColor(c.status),
-                      borderRadius: "500px",
-                      padding: "2px 8px",
-                      cursor: c.status !== "active" ? "pointer" : "default",
-                      textAlign: "center",
-                      fontWeight: "bold",
-                    }}
-                    onClick={() => {
-                      if (c.status !== "active") {
-                        setStatusPopup(c);
-                      }
-                    }}
-                  >
-                    {c.status}
-                  </TableCell>
-                  <TableCell>{c.total_queued ?? 0}</TableCell>
-                  <TableCell>{c.total_active ?? 0}</TableCell>
-                  <TableCell>{c.total_sent ?? 0}</TableCell>
-                  <TableCell>{c.total_failed ?? 0}</TableCell>
-                  <TableCell>
-                    {c.filters?.company || c.company || "-"}
-                  </TableCell>
-                  <TableCell>
-                    {c.filters?.country || c.country || "-"}
-                  </TableCell>
-                  <TableCell>
-                    {c.created_at
-                      ? new Date(c.created_at).toLocaleString()
-                      : "-"}
-                  </TableCell>
-                  <TableCell>
-                    {c.updated_at
-                      ? new Date(c.updated_at).toLocaleString()
-                      : "-"}
-                  </TableCell>
-                  <TableCell>
-                <IconButton
-                   onClick={() => {
-                        setEditData(c);
-                        setModalOpen(true);
-                      }}
-                  >
-                    <Image src="/edit.svg" alt="Edit" width={15} height={15} />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => handleDelete(c.id)}
-                  >
-                    <Image
-                      src="/delete.svg"
-                      alt="Delete"
-                      width={15}
-                      height={15}
-                    />
-                  </IconButton>
-
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <LeadCampaignTable
+        campaigns={campaigns}
+        getStatusColor={getStatusColor}
+        setStatusPopup={setStatusPopup}
+        setEditData={setEditData}
+        setModalOpen={setModalOpen}
+        handleDelete={handleDelete}
+      />
 
       <Dialog
         open={modalOpen}
@@ -321,7 +145,8 @@ export default function LeadCampaigns() {
               <TextField {...params} label="Email Template Group" />
             )}
           />
-          <Typography>Filters</Typography>
+          <Typography>Filter</Typography>
+
           {["company", "country"].map((field) => (
             <Autocomplete
               key={field}
