@@ -1,23 +1,19 @@
 "use client";
 import { useState } from "react";
 import {
-  AppBar,
   Box,
   CssBaseline,
   Divider,
   Drawer,
-  IconButton,
   List,
   ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
   Toolbar,
-  Typography,
   Tooltip,
 } from "@mui/material";
 import {
-  Menu as MenuIcon,
   People,
   Contacts,
   Campaign,
@@ -25,6 +21,7 @@ import {
   Description,
   Settings,
   Dashboard as DashboardIcon,
+  Menu as MenuIcon,
 } from "@mui/icons-material";
 
 import {
@@ -43,6 +40,8 @@ import Templates from "./Sidebar/Templates";
 import Setting from "./Sidebar/Setting";
 import UnsubscribedEmails from "./Sidebar/UnSubscribedEmails";
 import DashboardPage from "./Sidebar/dash";
+
+import Navbar from "./Navbar/page"
 
 const drawerWidth = 190;
 const collapsedWidth = 60;
@@ -132,36 +131,13 @@ function Sidebar({ open }) {
 }
 
 function DashboardLayout() {
-  const [open, setOpen] = useState(true);
+  const [open] = useState(true);
 
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar
-        position="fixed"
-        sx={{
-          zIndex: (theme) => theme.zIndex.drawer + 1,
-          backgroundColor: "#1565C0",
-        }}
-      >
-        <Toolbar sx={{ display: "flex", justifyContent: "space-between" }}>
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <IconButton
-              color="inherit"
-              edge="start"
-              onClick={() => setOpen(!open)}
-            >
-              <MenuIcon />
-            </IconButton>
-            <Typography variant="h6" noWrap component="div" fontWeight="bold">
-              Dashboard
-            </Typography>
-          </Box>
-        </Toolbar>
-      </AppBar>
-
+      <Navbar /> 
       <Sidebar open={open} />
-
       <Box
         component="main"
         sx={{
@@ -182,7 +158,6 @@ function DashboardLayout() {
           <Route path="/unSubscribedEmails" element={<UnsubscribedEmails />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/setting" element={<Setting />} />
-
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </Box>
