@@ -50,11 +50,8 @@ export default function EmailQueuesTable({
               <TableCell>Company</TableCell>
               <TableCell>Business</TableCell>
               <TableCell>Country</TableCell>
-              <TableCell>Phone</TableCell>
               <TableCell>Status</TableCell>
               <TableCell>Template</TableCell>
-              <TableCell>Created</TableCell>
-              <TableCell>Updated</TableCell>
             </TableRow>
           </TableHead>
 
@@ -106,9 +103,6 @@ export default function EmailQueuesTable({
                   <TableCell sx={{ fontSize: 10, py: 0.9 }}>
                     {item.country}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 10, py: 0.9 }}>
-                    {item.phone}
-                  </TableCell>
                   <TableCell
                     sx={{
                       fontSize: 10,
@@ -121,12 +115,6 @@ export default function EmailQueuesTable({
                   </TableCell>
                   <TableCell sx={{ fontSize: 10, py: 0.9 }}>
                     {item.email_template_group}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 10, py: 0.9 }}>
-                    {new Date(item.created_at).toLocaleDateString()}
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 10, py: 0.9 }}>
-                    {new Date(item.updated_at).toLocaleDateString()}
                   </TableCell>
                 </TableRow>
               ))

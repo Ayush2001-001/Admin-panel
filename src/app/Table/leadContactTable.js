@@ -61,7 +61,7 @@ export default function LeadContactsTable({
               <Image src="/add.svg" alt="Add" width={20} height={20} />
             }
             onClick={() => setAddOpen(true)}
-            sx={{ textTransform: "none", fontSize: 12, height: 36 }}
+            sx={{ textTransform: "none", fontSize: 12, height: 36, mr: 3 }}
           >
             Add Contact
           </Button>
@@ -72,7 +72,7 @@ export default function LeadContactsTable({
             startIcon={
               <Image src="/import.svg" alt="Import" width={20} height={20} />
             }
-            sx={{ textTransform: "none", fontSize: 12, height: 36 }}
+            sx={{ textTransform: "none", fontSize: 12, height: 36, mr: 1 }}
           >
             Import CSV
             <input
@@ -128,108 +128,142 @@ export default function LeadContactsTable({
         ))}
       </Box>
 
-      <TableContainer
-        component={Paper}
-        sx={{ maxHeight: 420, borderRadius: 2, boxShadow: 1 }}
+      <Paper
+        sx={{ width: "100%", borderRadius: 3, boxShadow: 2, overflowX: "auto" }}
       >
-        <Table stickyHeader size="small">
-          <TableHead>
-            <TableRow
-              sx={{
-                "& th": {
-                  backgroundColor: "primary.main",
-                  color: "#fff",
-                  fontSize: 11,
-                  fontWeight: 600,
-                  padding: "6px 8px",
-                  whiteSpace: "nowrap",
-                },
-              }}
-            >
-              {[
-                "ID",
-                "First Name",
-                "Last Name",
-                "Email",
-                "Designation",
-                "Company",
-                "Business",
-                "Country",
-                "Phone",
-                "Status",
-                "Verified",
-                "Created At",
-                "Updated At",
-                "Actions",
-              ].map((h) => (
-                <TableCell key={h}>{h}</TableCell>
-              ))}
-            </TableRow>
-          </TableHead>
-
-          <TableBody>
-            {filteredContacts.map((user) => (
+        <TableContainer sx={{ maxHeight: 450 }}>
+          <Table stickyHeader size="small" sx={{ minWidth: 1300 }}>
+            <TableHead>
               <TableRow
-                key={user.id}
-                hover
-                sx={{ "&:hover": { backgroundColor: "#f4f9ff" } }}
-              >
-                <TableCell sx={{ fontSize: 11 }}>{user.id}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.first_name}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.last_name}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.email}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.designation}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.company}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.business}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.country}</TableCell>
-                <TableCell sx={{ fontSize: 11 }}>{user.phone}</TableCell>
-                <TableCell
-                  sx={{
-                    fontSize: 11,
-                    color: user.status === "Active" ? "green" : "red",
+                sx={{
+                  "& th": {
+                    backgroundColor: "primary.main",
+                    color: "#fff",
+                    fontSize: 12,
                     fontWeight: 600,
+                    padding: "6px 8px",
+                    whiteSpace: "nowrap",
+                    textAlign: "center",
+                  },
+                }}
+              >
+                {[
+                  "ID",
+                  "First Name",
+                  "Last Name",
+                  "Email",
+                  "Designation",
+                  "Company",
+                  "Business",
+                  "Country",
+                  "Phone",
+                  "Status",
+                  "Verified",
+                  "Created At",
+                  "Updated At",
+                  "Actions",
+                ].map((h) => (
+                  <TableCell key={h}>{h}</TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+
+            <TableBody>
+              {filteredContacts.map((user, index) => (
+                <TableRow
+                  key={user.id}
+                  hover
+                  sx={{
+                    backgroundColor: index % 2 === 0 ? "#f9faff" : "#fff",
+                    "&:hover": { backgroundColor: "#e3f2fd" },
                   }}
                 >
-                  {user.status}
-                </TableCell>
-                <TableCell sx={{ fontSize: 11 }}>
-                  {user.is_verified ? "Yes" : "No"}
-                </TableCell>
-                <TableCell sx={{ fontSize: 11 }}>
-                  {new Date(user.created_at).toLocaleString()}
-                </TableCell>
-                <TableCell sx={{ fontSize: 11 }}>
-                  {new Date(user.updated_at).toLocaleString()}
-                </TableCell>
-                <TableCell align="center">
-                  <IconButton
-                    size="small"
-                    color="primary"
-                    onClick={() => {
-                      setCurrentUser(user);
-                      setOpen(true);
+                  <TableCell
+                    sx={{ fontSize: 11, py: 0.8, textAlign: "center" }}
+                  >
+                    {user.id}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.first_name}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.last_name}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.email}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.designation}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.company}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.business}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.country}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {user.phone}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      fontSize: 11,
+                      fontWeight: 600,
+                      color: user.status === "Active" ? "green" : "red",
+                      py: 0.8,
+                      textAlign: "center",
                     }}
                   >
-                    <Image src="/edit.svg" alt="Edit" width={16} height={16} />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    color="error"
-                    onClick={() => deleteContact(user.id)}
+                    {user.status}
+                  </TableCell>
+                  <TableCell
+                    sx={{ fontSize: 11, py: 0.8, textAlign: "center" }}
                   >
-                    <Image
-                      src="/delete.svg"
-                      alt="Delete"
-                      width={16}
-                      height={16}
-                    />
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                    {user.is_verified ? "Yes" : "No"}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {new Date(user.created_at).toLocaleString()}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.8 }}>
+                    {new Date(user.updated_at).toLocaleString()}
+                  </TableCell>
+                  <TableCell align="center" sx={{ fontSize: 11, py: 0.8 }}>
+                    <IconButton
+                      size="small"
+                      color="primary"
+                      onClick={() => {
+                        setCurrentUser(user);
+                        setOpen(true);
+                      }}
+                    >
+                      <Image
+                        src="/edit.svg"
+                        alt="Edit"
+                        width={16}
+                        height={16}
+                      />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      color="error"
+                      onClick={() => deleteContact(user.id)}
+                    >
+                      <Image
+                        src="/delete.svg"
+                        alt="Delete"
+                        width={16}
+                        height={16}
+                      />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      </Paper>
 
       <Dialog
         open={open}

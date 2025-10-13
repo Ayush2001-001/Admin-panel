@@ -25,7 +25,7 @@ import {
 } from "@mui/icons-material";
 
 import {
-  HashRouter as Router,
+  BrowserRouter as Router,
   Routes,
   Route,
   useNavigate,
@@ -49,11 +49,11 @@ const collapsedWidth = 60;
 const menu = [
   { path: "/dashboard", label: "Dashboard", icon: <DashboardIcon /> },
   { path: "/users", label: "Users", icon: <People /> },
-  { path: "/leadContact", label: "Lead Contact", icon: <Contacts /> },
-  { path: "/leadCampaigns", label: "Lead Campaigns", icon: <Campaign /> },
-  { path: "/emailQueues", label: "Email Queues", icon: <Email /> },
+  { path: "/lead_Contacts", label: "Lead Contact", icon: <Contacts /> },
+  { path: "/lead_Campaigns", label: "Lead Campaigns", icon: <Campaign /> },
+  { path: "/email_Queues", label: "Email Queues", icon: <Email /> },
   {
-    path: "/unSubscribedEmails",
+    path: "/unSubscribed_Emails",
     label: "Unsubscribed Emails",
     icon: <Email />,
   },
@@ -142,7 +142,7 @@ function DashboardLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: 2,
           backgroundColor: "#f9f9f9",
           minHeight: "100vh",
         }}
@@ -152,10 +152,10 @@ function DashboardLayout() {
         <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/users" element={<Users />} />
-          <Route path="/leadContact" element={<LeadContact />} />
-          <Route path="/leadCampaigns" element={<LeadCampaigns />} />
-          <Route path="/emailQueues" element={<EmailQueues />} />
-          <Route path="/unSubscribedEmails" element={<UnsubscribedEmails />} />
+          <Route path="/lead_Contacts" element={<LeadContact />} />
+          <Route path="/lead_Campaigns" element={<LeadCampaigns />} />
+          <Route path="/email_Queues" element={<EmailQueues />} />
+          <Route path="/unSubscribed_Emails" element={<UnsubscribedEmails />} />
           <Route path="/templates" element={<Templates />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

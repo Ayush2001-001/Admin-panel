@@ -42,8 +42,6 @@ export default function LeadCampaignTable({
     handleClose();
   };
 
-  
-
   return (
     <Paper sx={{ borderRadius: 2, boxShadow: 2, overflow: "auto" }}>
       <TableContainer sx={{ maxHeight: 500 }}>
@@ -56,6 +54,9 @@ export default function LeadCampaignTable({
                   color: "white",
                   fontSize: 11,
                   fontWeight: 600,
+                   padding: "6px 8px",
+                    whiteSpace: "nowrap",
+                    textAlign: "center",
                 },
               }}
             >
@@ -89,9 +90,13 @@ export default function LeadCampaignTable({
                   hover
                   sx={{ backgroundColor: index % 2 === 0 ? "#fafafa" : "#fff" }}
                 >
-                  <TableCell sx={{ fontSize: 11 }}>{c.id}</TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>{c.title}</TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>{c.description}</TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>{c.id}</TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
+                    {c.title}
+                  </TableCell>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
+                    {c.description}
+                  </TableCell>
                   <TableCell
                     onClick={(e) => handleMenuOpen(e, c)}
                     sx={{
@@ -103,65 +108,69 @@ export default function LeadCampaignTable({
                       backgroundColor: getStatusColor(c.status),
                       borderRadius: "12px",
                       px: 1,
-                      py: 0.5,
+                      py: 0.3,
                       textTransform: "capitalize",
                     }}
                   >
                     {c.status}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.total_queued ?? 0}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.total_active ?? 0}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.total_sent ?? 0}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.total_failed ?? 0}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.filters?.company || c.company || "-"}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.filters?.country || c.country || "-"}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.created_at
                       ? new Date(c.created_at).toLocaleString()
                       : "-"}
                   </TableCell>
-                  <TableCell sx={{ fontSize: 11 }}>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
                     {c.updated_at
                       ? new Date(c.updated_at).toLocaleString()
                       : "-"}
                   </TableCell>
-                  <TableCell>
-                    <IconButton
-                      onClick={() => {
-                        setEditData(c);
-                        setModalOpen(true);
-                      }}
-                    >
-                      <Image
-                        src="/edit.svg"
-                        alt="Edit"
-                        width={15}
-                        height={15}
-                      />
-                    </IconButton>
-                    <IconButton
-                      color="error"
-                      onClick={() => handleDelete(c.id)}
-                    >
-                      <Image
-                        src="/delete.svg"
-                        alt="Delete"
-                        width={15}
-                        height={15}
-                      />
-                    </IconButton>
+                  <TableCell sx={{ fontSize: 11, py: 0.9 }}>
+                    {c.status === "pending" && (
+                      <>
+                        <IconButton
+                          onClick={() => {
+                            setEditData(c);
+                            setModalOpen(true);
+                          }}
+                        >
+                          <Image
+                            src="/edit.svg"
+                            alt="Edit"
+                            width={15}
+                            height={15}
+                          />
+                        </IconButton>
+                        <IconButton
+                          color="error"
+                          onClick={() => handleDelete(c.id)}
+                        >
+                          <Image
+                            src="/delete.svg"
+                            alt="Delete"
+                            width={15}
+                            height={15}
+                          />
+                        </IconButton>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))
@@ -169,7 +178,6 @@ export default function LeadCampaignTable({
           </TableBody>
         </Table>
       </TableContainer>
-
 
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
         {selectedCampaign?.status === "pending" && [
@@ -189,9 +197,9 @@ export default function LeadCampaignTable({
           <MenuItem key="active" onClick={() => handleAction("active")}>
             Move to Active
           </MenuItem>,
-          <MenuItem key="pending" onClick={() => handleAction("pending")}>
-            Back to Pending
-          </MenuItem>,
+          // <MenuItem key="pending" onClick={() => handleAction("pending")}>
+          //   Back to Pending
+          // </MenuItem>,
           <MenuItem
             key="cancelled"
             onClick={() => handleAction("cancelled")}

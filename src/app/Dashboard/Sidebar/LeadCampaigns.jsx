@@ -44,7 +44,7 @@ export default function LeadCampaigns() {
       active: "#32CD32",
       completed: "#808080",
       cancelled: "#FF0000",
-    }[status] || "black");
+    }[status] || "grey");
 
   useEffect(() => {
     loadData();
@@ -147,7 +147,6 @@ export default function LeadCampaigns() {
         </DialogActions>
       </Dialog>
 
-      Status Change Dialog
       <Dialog open={!!statusPopup} onClose={() => setStatusPopup(null)}>
         <DialogTitle>Change Status</DialogTitle>
         <DialogActions sx={{ flexDirection: "column", gap: 1, p: 2 }}>
@@ -166,9 +165,9 @@ export default function LeadCampaigns() {
               <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "active")}>
                 Move to Active
               </Button>
-              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "pending")}>
+              {/* <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "pending")}>
                 Back to Pending
-              </Button>
+              </Button> */}
               <Button fullWidth color="error" onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}>
                 Cancel
               </Button>

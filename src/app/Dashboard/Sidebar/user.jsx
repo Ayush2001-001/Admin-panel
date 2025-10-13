@@ -52,11 +52,12 @@ export default function Users() {
         Users Data
       </Typography>
 
-      <Box sx={{ display: "flex", gap: 2, mb: 2, ml: 50 }}>
+      <Box sx={{ display: "flex", gap: 2, mb: 2,  }}>
         <Typography variant="body1">
           Total result: {filteredUsers.length}
         </Typography>
         <TextField
+        sx={{ml:75}}
           size="small"
           label="Search"
           value={search}

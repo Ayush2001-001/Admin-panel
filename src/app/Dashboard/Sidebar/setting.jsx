@@ -3,45 +3,31 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Switch } from "@mui/material";
 import SettingsTable from "../../Table/settingsTable";
-import { fetchSettingsApi, switchSettingApi } from "../../../Api/settingsApi";
+import { fetchSettingsApi } from "../../../Api/settingsApi";
 
 export default function Setting() {
   const [settings, setSettings] = useState([]);
   const [emailEnabled, setEmailEnabled] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const loadSettings = async () => {
-    try {
-      const json = await fetchSettingsApi();
-      if (json && Array.isArray(json.data)) {
-        setSettings(json.data);
-        const leadSetting = json.data.find(
-          (item) => item.setting_key === "lead_email_enabled"
-        );
-        setEmailEnabled(leadSetting?.setting_value === "true");
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
 
   useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const res = await fetchSettingsApi();
+        if (res?.data) {
+          setSettings(res.data);
+
+          const leadSetting = res.data.find(
+            (item) => item.setting_key === "lead_email_enabled"
+          );
+          setEmailEnabled(leadSetting?.setting_value === "true");
+        }
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      }
+    };
+
     loadSettings();
   }, []);
-
-  const handleToggleEmail = async () => {
-    setLoading(true);
-    try {
-      await switchSettingApi(emailEnabled);
-      setEmailEnabled(!emailEnabled);
-      loadSettings();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update setting");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Box sx={{ p: 2 }}>
@@ -53,12 +39,7 @@ export default function Setting() {
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography sx={{ fontSize: 13 }}>Lead Email Sending:</Typography>
-        <Switch
-          checked={emailEnabled}
-          onChange={handleToggleEmail}
-          color="primary"
-          disabled={loading}
-        />
+        <Switch checked={emailEnabled} color="primary" disabled />
         <Typography
           sx={{
             fontSize: 13,
@@ -70,7 +51,13 @@ export default function Setting() {
         </Typography>
       </Box>
 
-      <SettingsTable settings={settings} />
+      <SettingsTable
+        settings={settings.map((s) =>
+          s.setting_key === "lead_email_enabled"
+            ? { ...s, setting_value: emailEnabled ? "true" : "false" }
+            : s
+        )}
+      />
     </Box>
   );
 }
