@@ -1,9 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import Cookies from "js-cookie";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   Box,
@@ -12,44 +11,27 @@ import {
   Typography,
   TextField,
   Button,
+  CircularProgress,
 } from "@mui/material";
+import ROUTES from "../routes";
+import { loginUser } from "../../Api/auth";
 
-export default function Login() {
+export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const router = useRouter();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/auth/signin`, 
-        {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await res.json();
-     
-      if (!res.ok) {
-        throw new Error(data.detail || "Invalid credentials");
-      }
-
+      const data = await loginUser(email, password);
       Cookies.set("token", data.data.access_token);
-
-      toast.success("Login successful", { position: "top-right" });
-
-      setTimeout(() => {
-        router.push("/Dashboard");
-      },1000); 
+      toast.success("Login successful!");
+      setTimeout(() => router.push(ROUTES.DASHBOARD), 1500);
     } catch (err) {
-      toast.error(err.message || "Something went wrong ", {
-        position: "top-right",
-      });
+      toast.error(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -68,18 +50,12 @@ export default function Login() {
             "linear-gradient(135deg, rgba(58,123,213,0.4), rgba(0,210,255,0.4))",
         }}
       >
-        <Card
-          variant="outlined"
-          sx={{ width: "100%", maxWidth: 400, p: 3, borderRadius: 3 }}
-        >
+        <Card sx={{ width: "100%", maxWidth: 400, p: 3, borderRadius: 3 }}>
           <CardContent sx={{ textAlign: "center" }}>
-            <Image src="/logo.svg" alt="Logo" width={120} height={90} />
-
-            <Typography variant="h5" sx={{ mt: 1, fontWeight: "bold" }}>
+            <Typography variant="h5" fontWeight="bold" gutterBottom>
               Login
             </Typography>
-
-            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
+            <Box component="form" onSubmit={handleSubmit}>
               <TextField
                 fullWidth
                 margin="normal"
@@ -95,16 +71,20 @@ export default function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
-
               <Button
-                type="submit"
                 fullWidth
                 variant="contained"
+                sx={{ mt: 2 }}
+                type="submit"
                 disabled={loading}
-                sx={{ mt: 3 }}
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading ? <CircularProgress size={24} /> : "Sign In"}
               </Button>
+              <Typography sx={{ mt: 2 }}>
+                <a href={ROUTES.FORGOT_PASSWORD} style={{ color: "#1976d2" }}>
+                  Forgot Password?
+                </a>
+              </Typography>
             </Box>
           </CardContent>
         </Card>
