@@ -1,75 +1,174 @@
 "use client";
-import { Box, Drawer, List, ListItem, ListItemButton, ListItemText } from "@mui/material";
-import Navbar from "./Navbar/page";
-import Users from "./Sidebar/User";
-import LeadContact from "./Sidebar/LeadContact";
+import { useState } from "react";
+import {
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Toolbar,
+  Tooltip,
+} from "@mui/material";
+import {
+  People,
+  Contacts,
+  Campaign,
+  Email,
+  Description,
+  Settings,
+  Dashboard as DashboardIcon,
+  Menu as MenuIcon,
+} from "@mui/icons-material";
+
+import {
+  HashRouter as Router,
+  Routes,
+  Route,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
+
+import Users from "./Sidebar/user";
+import LeadContact from "./Sidebar/leadContact";
 import LeadCampaigns from "./Sidebar/LeadCampaigns";
 import EmailQueues from "./Sidebar/EmailQues";
 import Templates from "./Sidebar/Templates";
 import Setting from "./Sidebar/Setting";
-import { useState } from "react";
+import UnsubscribedEmails from "./Sidebar/UnSubscribedEmails";
+import DashboardPage from "./Sidebar/dash";
+
+import Navbar from "./Navbar/page"
 
 const drawerWidth = 190;
+const collapsedWidth = 60;
+
 const menu = [
-  { id: "users", label: "Users" },
-  { id: "leadContact", label: "Lead Contact" },
-  { id: "leadCampaigns", label: "Lead Campaigns" },
-  { id: "emailQueues", label: "Email Queues" },
-  { id: "templates", label: "Templates" },
-  { id: "setting", label: "Setting" },
+  { path: "/dashboard", label: "Dashboard", icon: <DashboardIcon /> },
+  { path: "/users", label: "Users", icon: <People /> },
+  { path: "/leadContact", label: "Lead Contact", icon: <Contacts /> },
+  { path: "/leadCampaigns", label: "Lead Campaigns", icon: <Campaign /> },
+  { path: "/emailQueues", label: "Email Queues", icon: <Email /> },
+  {
+    path: "/unSubscribedEmails",
+    label: "Unsubscribed Emails",
+    icon: <Email />,
+  },
+  { path: "/templates", label: "Templates", icon: <Description /> },
+  { path: "/setting", label: "Setting", icon: <Settings /> },
 ];
 
-export default function Dashboard() {
-  const [selected, setSelected] = useState("dashboard");
+function Sidebar({ open }) {
+  const navigate = useNavigate();
+  const [selected, setSelected] = useState("/dashboard");
 
   return (
-    <Box sx={{ display: "flex" }}>
-      <Box sx={{ width: "100%", position: "fixed", top: 0, zIndex: 1201 }}>
-        <Navbar />
-      </Box>
-
-      <Drawer
-        variant="permanent"
-        sx={{
-          width: drawerWidth,
-          flexShrink: 0,
-          "& .MuiDrawer-paper": {
-            width: drawerWidth,
-            boxSizing: "border-box",
-            marginTop: "13vh",
-          },
-        }}
-      >
-        <List>
-          {menu.map((item) => (
-            <ListItem key={item.id} disablePadding>
+    <Drawer
+      variant="permanent"
+      open={open}
+      sx={{
+        width: open ? drawerWidth : collapsedWidth,
+        flexShrink: 0,
+        "& .MuiDrawer-paper": {
+          width: open ? drawerWidth : collapsedWidth,
+          transition: "width 0.3s ease",
+          overflowX: "hidden",
+        },
+      }}
+    >
+      <Toolbar />
+      <Divider />
+      <List>
+        {menu.map((item) => (
+          <Tooltip
+            key={item.path}
+            title={!open ? item.label : ""}
+            placement="right"
+            arrow
+          >
+            <ListItem disablePadding sx={{ display: "block" }}>
               <ListItemButton
-                selected={selected === item.id}
-                onClick={() => setSelected(item.id)}
+                onClick={() => {
+                  setSelected(item.path);
+                  navigate(item.path);
+                }}
+                selected={selected === item.path}
                 sx={{
+                  minHeight: 48,
+                  justifyContent: open ? "initial" : "center",
+                  px: 2.5,
                   "&.Mui-selected": {
-                    backgroundColor:  "#1565C0",
+                    backgroundColor: "#1565C0",
                     color: "white",
                     "&:hover": { backgroundColor: "#4879b1ff" },
                   },
                 }}
               >
-                <ListItemText primary={item.label} sx={{ fontWeight: "bold" }} />
+                <ListItemIcon
+                  sx={{
+                    minWidth: 0,
+                    mr: open ? 2 : "auto",
+                    justifyContent: "center",
+                    color: selected === item.path ? "white" : "inherit",
+                  }}
+                >
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  sx={{ opacity: open ? 1 : 0 }}
+                />
               </ListItemButton>
             </ListItem>
-          ))}
-        </List>
-      </Drawer>
+          </Tooltip>
+        ))}
+      </List>
+    </Drawer>
+  );
+}
 
-      <Box component="main" sx={{ flexGrow: 1, p: 3, marginTop: "13vh" }}>
-        {selected === "dashboard" && <h1>Welcome to Dashboard</h1>}
-        {selected === "users" && <Users />}
-        {selected === "leadContact" && <LeadContact />}
-        {selected === "leadCampaigns" && <LeadCampaigns />}
-        {selected === "emailQueues" && <EmailQueues />}
-        {selected === "templates" && <Templates />}
-        {selected === "setting" && <Setting />}
+function DashboardLayout() {
+  const [open] = useState(true);
+
+  return (
+    <Box sx={{ display: "flex" }}>
+      <CssBaseline />
+      <Navbar /> 
+      <Sidebar open={open} />
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: 3,
+          backgroundColor: "#f9f9f9",
+          minHeight: "100vh",
+        }}
+      >
+        <Toolbar />
+
+        <Routes>
+          <Route path="/dashboard" element={<DashboardPage />} />
+          <Route path="/users" element={<Users />} />
+          <Route path="/leadContact" element={<LeadContact />} />
+          <Route path="/leadCampaigns" element={<LeadCampaigns />} />
+          <Route path="/emailQueues" element={<EmailQueues />} />
+          <Route path="/unSubscribedEmails" element={<UnsubscribedEmails />} />
+          <Route path="/templates" element={<Templates />} />
+          <Route path="/setting" element={<Setting />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
       </Box>
     </Box>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Router>
+      <DashboardLayout />
+    </Router>
   );
 }

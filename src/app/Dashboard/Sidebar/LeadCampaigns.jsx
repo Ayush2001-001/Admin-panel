@@ -1,141 +1,192 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
-  Button,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Table,
-  TextField,
   Typography,
-  TableBody,
-  Paper,
+  Button,
   Dialog,
   DialogTitle,
   DialogContent,
   DialogActions,
+  TextField,
   Autocomplete,
 } from "@mui/material";
+import LeadCampaignTable from "../../Table/leadCampaignTable";
+import {
+  fetchCampaigns,
+  fetchMeta,
+  saveCampaign,
+  deleteCampaign,
+  updateCampaignStatus,
+} from "../../../Api/leadCampaignApi";
 
 export default function LeadCampaigns() {
-  const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({
+  const [campaigns, setCampaigns] = useState([]);
+  const [meta, setMeta] = useState({});
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editData, setEditData] = useState(null);
+  const [statusPopup, setStatusPopup] = useState(null);
+
+  const emptyCampaign = {
     title: "",
     description: "",
-    emailGroup: "",
-    country: "",
+    email_template_group: "",
     company: "",
+    country: "",
+    designation: "",
     business: "",
-  });
+  };
 
-  const emailGroups = ["Project", "Staff", "Remote Job"];
-  const countries = [""];
-  const companies = [""];
-  const businesses = [""];
+  const getStatusColor = (status) =>
+    ({
+      pending: "#FFA500",
+      queued: "#1E90FF",
+      active: "#32CD32",
+      completed: "#808080",
+      cancelled: "#FF0000",
+    }[status] || "black");
+
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  const loadData = async () => {
+    setCampaigns(await fetchCampaigns());
+    setMeta(await fetchMeta());
+  };
+
+  const handleSave = async () => {
+    await saveCampaign(editData);
+    setModalOpen(false);
+    loadData();
+  };
+
+  const handleDelete = async (id) => {
+    await deleteCampaign(id);
+    loadData();
+  };
+
+  const handleStatusUpdate = async (id, newStatus) => {
+    await updateCampaignStatus(id, newStatus);
+    setStatusPopup(null);
+    loadData();
+  };
 
   return (
-    <Box>
-      <Box sx={{ display: "flex" }}>
-        <Typography sx={{ fontSize: 25, fontWeight: "bold" }}>
-          Campaign
+    <Box p={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+        <Typography variant="h5" fontWeight="bold">
+          Lead Campaigns
         </Typography>
         <Button
           variant="contained"
-          sx={{ marginLeft: 100, width: 150, height: 35 }}
-          onClick={() => setOpen(true)}
+          onClick={() => {
+            setEditData(emptyCampaign);
+            setModalOpen(true);
+          }}
         >
-          Add
+          Add Campaign
         </Button>
       </Box>
 
-      <TableContainer component={Paper} sx={{ maxHeight: 400, mt: 5 }}>
-        <Table stickyHeader>
-          <TableHead>
-            <TableRow
-              sx={{
-                "& th": {
-                  backgroundColor: "primary.main",
-                  color: "white",
-                },
-              }}
-            >
-              <TableCell>Id</TableCell>
-              <TableCell>Title</TableCell>
-              <TableCell>Description</TableCell>
-              <TableCell>Email template group</TableCell>
-              <TableCell>Country</TableCell>
-              <TableCell>Company</TableCell>
-              <TableCell>Business</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            <TableRow>
-              <TableCell>1</TableCell>
-              <TableCell>{form.title}</TableCell>
-              <TableCell>{form.description}</TableCell>
-              <TableCell>{form.emailGroup}</TableCell>
-              <TableCell>{form.country}</TableCell>
-              <TableCell>{form.company}</TableCell>
-              <TableCell>{form.business}</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </TableContainer>
+      <LeadCampaignTable
+        campaigns={campaigns}
+        getStatusColor={getStatusColor}
+        setEditData={setEditData}
+        setModalOpen={setModalOpen}
+        handleDelete={handleDelete}
+        updateStatus={handleStatusUpdate}
+      />
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>Add Campaign</DialogTitle>
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
-        >
+      <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
+        <DialogTitle>{editData?.id ? "Edit Campaign" : "Add Campaign"}</DialogTitle>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
           <TextField
             label="Title"
-            value={form.title}
-            onChange={(e) => setForm({ ...form, title: e.target.value })}
+            value={editData?.title || ""}
+            onChange={(e) => setEditData({ ...editData, title: e.target.value })}
           />
           <TextField
             label="Description"
-            value={form.description}
-            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            value={editData?.description || ""}
+            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
           />
+
           <Autocomplete
-            options={emailGroups}
-            value={form.emailGroup}
-            onChange={(e, v) => setForm({ ...form, emailGroup: v })}
-            renderInput={(params) => (
-              <TextField {...params} label="Email Template Group" />
-            )}
+            options={meta.email_template_groups || []}
+            getOptionLabel={(o) => o.value || ""}
+            value={
+              meta.email_template_groups?.find(
+                (o) => o.key === editData?.email_template_group
+              ) || null
+            }
+            onChange={(_, v) =>
+              setEditData({ ...editData, email_template_group: v?.key || "" })
+            }
+            renderInput={(params) => <TextField {...params} label="Email Template Group" />}
           />
-          <Autocomplete
-            options={countries}
-            value={form.country}
-            onChange={(e, v) => setForm({ ...form, country: v })}
-            renderInput={(params) => <TextField {...params} label="Country" />}
-          />
-          <Autocomplete
-            options={companies}
-            value={form.company}
-            onChange={(e, v) => setForm({ ...form, company: v })}
-            renderInput={(params) => <TextField {...params} label="Company" />}
-          />
-          <Autocomplete
-            options={businesses}
-            value={form.business}
-            onChange={(e, v) => setForm({ ...form, business: v })}
-            renderInput={(params) => <TextField {...params} label="Business" />}
-          />
+
+          {["company", "country"].map((field) => (
+            <Autocomplete
+              key={field}
+              freeSolo
+              options={meta[`${field}s`] || []}
+              value={editData?.[field] || ""}
+              onChange={(_, v) => setEditData({ ...editData, [field]: v || "" })}
+              renderInput={(params) => (
+                <TextField {...params} label={field.charAt(0).toUpperCase() + field.slice(1)} />
+              )}
+            />
+          ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            onClick={() => {
-              setOpen(false);
-            }}
-          >
+          <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+          <Button variant="contained" onClick={handleSave}>
             Save
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      Status Change Dialog
+      <Dialog open={!!statusPopup} onClose={() => setStatusPopup(null)}>
+        <DialogTitle>Change Status</DialogTitle>
+        <DialogActions sx={{ flexDirection: "column", gap: 1, p: 2 }}>
+          {statusPopup?.status === "pending" && (
+            <>
+              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "queued")}>
+                Move to Queued
+              </Button>
+              <Button fullWidth color="error" onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}>
+                Cancel
+              </Button>
+            </>
+          )}
+          {statusPopup?.status === "queued" && (
+            <>
+              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "active")}>
+                Move to Active
+              </Button>
+              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "pending")}>
+                Back to Pending
+              </Button>
+              <Button fullWidth color="error" onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}>
+                Cancel
+              </Button>
+            </>
+          )}
+          {statusPopup?.status === "active" && (
+            <>
+              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "stopped")}>
+                Stop Campaign
+              </Button>
+              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "active")}>
+                Resume Campaign
+              </Button>
+              <Button fullWidth color="error" onClick={() => setStatusPopup(null)}>
+                Cancel
+              </Button>
+            </>
+          )}
         </DialogActions>
       </Dialog>
     </Box>
