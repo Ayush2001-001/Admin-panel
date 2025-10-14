@@ -1,9 +1,16 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Box, Typography, TextField, Autocomplete } from "@mui/material";
+import {
+  Box,
+  Typography,
+  TextField,
+  Autocomplete,
+  CircularProgress,
+} from "@mui/material";
 import { fetchEmailQueues } from "../../../Api/emailqueueApi";
 import EmailQueuesTable from "../../Table/emailqueueTable";
+
 export default function EmailQueues() {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState("");
@@ -11,6 +18,7 @@ export default function EmailQueues() {
   const [designationFilter, setDesignationFilter] = useState("All");
   const [companyFilter, setCompanyFilter] = useState("All");
   const [businessFilter, setBusinessFilter] = useState("All");
+  const [loading, setLoading] = useState(true); 
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -18,10 +26,13 @@ export default function EmailQueues() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        setLoading(true);
         const result = await fetchEmailQueues();
         setData(result);
       } catch (err) {
         console.error(err);
+      } finally {
+        setLoading(false);
       }
     };
     loadData();
@@ -54,6 +65,21 @@ export default function EmailQueues() {
       matchesBusiness
     );
   });
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "70vh",
+        }}
+      >
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 2 }}>

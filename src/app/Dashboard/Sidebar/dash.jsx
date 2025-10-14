@@ -10,7 +10,7 @@ import {
   Fade,
 } from "@mui/material";
 import { People, Contacts, Campaign, Email } from "@mui/icons-material";
-import { fetchDashboardData } from "../../../Api/dashboardApi"; 
+import { fetchDashboardData } from "../../../Api/dashboardApi";
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);
@@ -46,30 +46,49 @@ export default function DashboardPage() {
   const StatCard = ({ title, value, icon, gradient }) => (
     <Fade in timeout={500}>
       <Paper
-        elevation={3}
         sx={{
-          p: 3,
+          p: 2,
           borderRadius: 3,
+          boxShadow: 3,
           background: gradient,
-          color: "white",
-          boxShadow: "0 4px 25px rgba(0,0,0,0.1)",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          backdropFilter: "blur(8px)",
-          transition: "transform 0.25s ease",
-          "&:hover": { transform: "translateY(-5px)" },
+          color: "#fff",
+          minWidth: 220,
+          position: "relative",
         }}
       >
-        <Box>
-          <Typography variant="subtitle2" sx={{ opacity: 0.9 }}>
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
             {title}
           </Typography>
-          <Typography variant="h4" fontWeight="bold">
-            {value}
-          </Typography>
+          <Box sx={{ textAlign: "right" }}>{icon}</Box>
         </Box>
-        {icon}
+
+        <Box
+          sx={{
+            width: "100%",
+            height: "2px",
+            backgroundColor: "rgba(255,255,255,0.6)",
+            mt: 1,
+            mb: 1.5,
+          }}
+        />
+
+        <Typography
+          variant="h5"
+          sx={{
+            textAlign: "center",
+            fontWeight: 700,
+            letterSpacing: 0.5,
+          }}
+        >
+          {value}
+        </Typography>
       </Paper>
     </Fade>
   );
@@ -83,7 +102,7 @@ export default function DashboardPage() {
       <Typography variant="h6" fontWeight="bold" mb={2}>
         User Summary
       </Typography>
-      <Grid container spacing={3} mb={4}>
+      <Grid container spacing={3} mb={4} display="flex" justifyContent="center">
         <Grid item xs={12} md={3}>
           <StatCard
             title="Total Users"
@@ -97,7 +116,7 @@ export default function DashboardPage() {
       <Typography variant="h6" fontWeight="bold" mb={2}>
         Lead Contacts
       </Typography>
-      <Grid container spacing={3} mb={4}>
+      <Grid container spacing={3} mb={4} display="flex" justifyContent="center">
         <Grid item xs={12} md={3}>
           <StatCard
             title="Total Leads"
@@ -135,7 +154,7 @@ export default function DashboardPage() {
       <Typography variant="h6" fontWeight="bold" mb={2}>
         Lead Campaigns
       </Typography>
-      <Grid container spacing={3} mb={4}>
+      <Grid container spacing={3} mb={4} display="flex" justifyContent="center">
         <Grid item xs={12} md={4}>
           <StatCard
             title="Total Campaigns"
@@ -189,7 +208,7 @@ export default function DashboardPage() {
       <Typography variant="h6" fontWeight="bold" mb={2}>
         Email Queue
       </Typography>
-      <Grid container spacing={3}>
+      <Grid container spacing={3} mb={4} display="flex" justifyContent="center">
         <Grid item xs={12} md={3}>
           <StatCard
             title="Emails Pending"

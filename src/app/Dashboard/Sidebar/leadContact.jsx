@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
+import { Box, CircularProgress } from "@mui/material";
 import LeadContactsTable from "../../Table/leadContactTable";
 import {
   fetchLeadContacts,
@@ -26,9 +27,11 @@ export default function ContactsPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [newContact, setnewContact] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const loadContacts = async () => {
     try {
+      setLoading(true);
       const res = await fetchLeadContacts();
       if (!res.success) return;
 
@@ -45,6 +48,8 @@ export default function ContactsPage() {
       }));
     } catch (err) {
       console.error("Failed to fetch contacts:", err);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -57,26 +62,69 @@ export default function ContactsPage() {
   );
 
   const handleUpdate = async () => {
-    await updateLeadContact(currentUser.id, currentUser);
-    loadContacts();
-    setOpen(false);
+    try {
+      setLoading(true);
+      await updateLeadContact(currentUser.id, currentUser);
+      await loadContacts();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setOpen(false);
+    }
   };
 
   const handleAdd = async () => {
-    await addLeadContact(newContact);
-    loadContacts();
-    setAddOpen(false);
+    try {
+      setLoading(true);
+      await addLeadContact(newContact);
+      await loadContacts();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+      setAddOpen(false);
+    }
   };
 
   const handleDelete = async (id) => {
-    await deleteLeadContact(id);
-    loadContacts();
+    try {
+      setLoading(true);
+      await deleteLeadContact(id);
+      await loadContacts();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleImport = async (file) => {
-    await importLeadContacts(file);
-    loadContacts();
+    try {
+      setLoading(true);
+      await importLeadContacts(file);
+      await loadContacts();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "75vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <LeadContactsTable

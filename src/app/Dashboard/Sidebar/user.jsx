@@ -10,6 +10,7 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  CircularProgress,
 } from "@mui/material";
 import UsersTable from "../../Table/usersTable";
 import { fetchCurrentUser } from "../../../Api/usersApi";
@@ -19,16 +20,21 @@ export default function Users() {
   const [open, setOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const loadUser = async () => {
+    try {
+      setLoading(true);
+      const data = await fetchCurrentUser();
+      setUsers(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadUser = async () => {
-      try {
-        const data = await fetchCurrentUser();
-        setUsers(data);
-      } catch (err) {
-        console.error(err);
-      }
-    };
     loadUser();
   }, []);
 
@@ -42,8 +48,28 @@ export default function Users() {
   };
 
   const handleSave = () => {
-    setUsers(users.map((u) => (u.id === currentUser.id ? currentUser : u)));
+    if (!currentUser || !currentUser.id) return;
+
+    const updatedUsers = users.map((u) => {
+      if (u.id === currentUser.id) {
+        return currentUser;
+      }
+      return u;
+    });
+
+    setUsers(updatedUsers);
+
     setOpen(false);
+  };
+
+  const handleSearch = async () => {
+    setLoading(true);
+    setTimeout(() => setLoading(false), 1000);
+  };
+
+  const handleReset = async () => {
+    setSearch("");
+    loadUser();
   };
 
   return (
@@ -52,21 +78,41 @@ export default function Users() {
         Users Data
       </Typography>
 
-      <Box sx={{ display: "flex", gap: 2, mb: 2, ml: 50 }}>
+      <Box sx={{ display: "flex", gap: 2, mb: 2, alignItems: "center" }}>
         <Typography variant="body1">
           Total result: {filteredUsers.length}
         </Typography>
+
         <TextField
+          sx={{ ml: "auto" }}
           size="small"
           label="Search"
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <Button variant="contained">Search</Button>
-        <Button variant="contained">Reset</Button>
+
+        <Button variant="contained" onClick={handleSearch}>
+          Search
+        </Button>
+        <Button variant="outlined" onClick={handleReset}>
+          Reset
+        </Button>
       </Box>
 
-      <UsersTable users={filteredUsers} onEdit={handleEdit} />
+      {loading ? (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+            height: 300,
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      ) : (
+        <UsersTable users={filteredUsers} onEdit={handleEdit} />
+      )}
 
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Edit User</DialogTitle>

@@ -1,64 +1,81 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Typography, Switch } from "@mui/material";
+import { Box, Typography, Switch, CircularProgress } from "@mui/material";
 import SettingsTable from "../../Table/settingsTable";
-import { fetchSettingsApi, switchSettingApi } from "../../../Api/settingsApi";
+import { fetchSettingsApi } from "../../../Api/settingsApi";
 
 export default function Setting() {
   const [settings, setSettings] = useState([]);
   const [emailEnabled, setEmailEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const loadSettings = async () => {
-    try {
-      const json = await fetchSettingsApi();
-      if (json && Array.isArray(json.data)) {
-        setSettings(json.data);
-        const leadSetting = json.data.find(
-          (item) => item.setting_key === "lead_email_enabled"
-        );
-        setEmailEnabled(leadSetting?.setting_value === "true");
-      }
-    } catch (err) {
-      console.error("Fetch error:", err);
-    }
-  };
-
   useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        setLoading(true); 
+        const res = await fetchSettingsApi();
+
+        if (res?.data) {
+          setSettings(res.data);
+
+          const leadSetting = res.data.find(
+            (item) => item.setting_key === "lead_email_enabled"
+          );
+          setEmailEnabled(leadSetting?.setting_value === "true");
+        }
+      } catch (err) {
+        console.error("Error loading settings:", err);
+      } finally {
+        setLoading(false); 
+      }
+    };
+
     loadSettings();
   }, []);
 
-  const handleToggleEmail = async () => {
-    setLoading(true);
-    try {
-      await switchSettingApi(emailEnabled);
-      setEmailEnabled(!emailEnabled);
-      loadSettings();
-    } catch (err) {
-      console.error(err);
-      alert("Failed to update setting");
-    } finally {
-      setLoading(false);
+  const updatedSettings = settings.map((item) => {
+    if (item.setting_key === "lead_email_enabled") {
+      return {
+        ...item,
+        setting_value: emailEnabled ? "true" : "false",
+      };
+    } else {
+      return item;
     }
-  };
+  });
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "70vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
 
   return (
     <Box sx={{ p: 2 }}>
       <Typography
-        sx={{ fontSize: 22, fontWeight: "bold", mb: 2, color: "primary.main" }}
+        sx={{
+          fontSize: 22,
+          fontWeight: "bold",
+          mb: 2,
+          color: "primary.main",
+        }}
       >
         Settings
       </Typography>
 
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography sx={{ fontSize: 13 }}>Lead Email Sending:</Typography>
-        <Switch
-          checked={emailEnabled}
-          onChange={handleToggleEmail}
-          color="primary"
-          disabled={loading}
-        />
+        <Switch checked={emailEnabled} color="primary" disabled />
         <Typography
           sx={{
             fontSize: 13,
@@ -70,7 +87,7 @@ export default function Setting() {
         </Typography>
       </Box>
 
-      <SettingsTable settings={settings} />
+      <SettingsTable settings={updatedSettings} />
     </Box>
   );
 }
