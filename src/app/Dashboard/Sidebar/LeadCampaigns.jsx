@@ -10,6 +10,7 @@ import {
   DialogActions,
   TextField,
   Autocomplete,
+  CircularProgress,
 } from "@mui/material";
 import LeadCampaignTable from "../../Table/leadCampaignTable";
 import {
@@ -26,6 +27,7 @@ export default function LeadCampaigns() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [statusPopup, setStatusPopup] = useState(null);
+  const [loading, setLoading] = useState(true); 
 
   const emptyCampaign = {
     title: "",
@@ -51,30 +53,80 @@ export default function LeadCampaigns() {
   }, []);
 
   const loadData = async () => {
-    setCampaigns(await fetchCampaigns());
-    setMeta(await fetchMeta());
+    try {
+      setLoading(true);
+      const campaignData = await fetchCampaigns();
+      const metaData = await fetchMeta();
+      setCampaigns(campaignData);
+      setMeta(metaData);
+    } catch (err) {
+      console.error("Error loading data:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSave = async () => {
-    await saveCampaign(editData);
-    setModalOpen(false);
-    loadData();
+    try {
+      setLoading(true);
+      await saveCampaign(editData);
+      setModalOpen(false);
+      await loadData();
+    } catch (err) {
+      console.error("Error saving:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleDelete = async (id) => {
-    await deleteCampaign(id);
-    loadData();
+    try {
+      setLoading(true);
+      await deleteCampaign(id);
+      await loadData();
+    } catch (err) {
+      console.error("Error deleting:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleStatusUpdate = async (id, newStatus) => {
-    await updateCampaignStatus(id, newStatus);
-    setStatusPopup(null);
-    loadData();
+    try {
+      setLoading(true);
+      await updateCampaignStatus(id, newStatus);
+      setStatusPopup(null);
+      await loadData();
+    } catch (err) {
+      console.error("Error updating status:", err);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "75vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress color="primary" />
+      </Box>
+    );
+  }
 
   return (
     <Box p={3}>
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
         <Typography variant="h5" fontWeight="bold">
           Lead Campaigns
         </Typography>
@@ -98,18 +150,31 @@ export default function LeadCampaigns() {
         updateStatus={handleStatusUpdate}
       />
 
-      <Dialog open={modalOpen} onClose={() => setModalOpen(false)} fullWidth maxWidth="sm">
-        <DialogTitle>{editData?.id ? "Edit Campaign" : "Add Campaign"}</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+      <Dialog
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        fullWidth
+        maxWidth="sm"
+      >
+        <DialogTitle>
+          {editData?.id ? "Edit Campaign" : "Add Campaign"}
+        </DialogTitle>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+        >
           <TextField
             label="Title"
             value={editData?.title || ""}
-            onChange={(e) => setEditData({ ...editData, title: e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, title: e.target.value })
+            }
           />
           <TextField
             label="Description"
             value={editData?.description || ""}
-            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, description: e.target.value })
+            }
           />
 
           <Autocomplete
@@ -123,7 +188,9 @@ export default function LeadCampaigns() {
             onChange={(_, v) =>
               setEditData({ ...editData, email_template_group: v?.key || "" })
             }
-            renderInput={(params) => <TextField {...params} label="Email Template Group" />}
+            renderInput={(params) => (
+              <TextField {...params} label="Email Template Group" />
+            )}
           />
 
           {["company", "country"].map((field) => (
@@ -132,9 +199,14 @@ export default function LeadCampaigns() {
               freeSolo
               options={meta[`${field}s`] || []}
               value={editData?.[field] || ""}
-              onChange={(_, v) => setEditData({ ...editData, [field]: v || "" })}
+              onChange={(_, v) =>
+                setEditData({ ...editData, [field]: v || "" })
+              }
               renderInput={(params) => (
-                <TextField {...params} label={field.charAt(0).toUpperCase() + field.slice(1)} />
+                <TextField
+                  {...params}
+                  label={field.charAt(0).toUpperCase() + field.slice(1)}
+                />
               )}
             />
           ))}
@@ -152,36 +224,59 @@ export default function LeadCampaigns() {
         <DialogActions sx={{ flexDirection: "column", gap: 1, p: 2 }}>
           {statusPopup?.status === "pending" && (
             <>
-              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "queued")}>
+              <Button
+                fullWidth
+                onClick={() => handleStatusUpdate(statusPopup.id, "queued")}
+              >
                 Move to Queued
               </Button>
-              <Button fullWidth color="error" onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}>
+              <Button
+                fullWidth
+                color="error"
+                onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}
+              >
                 Cancel
               </Button>
             </>
           )}
+
           {statusPopup?.status === "queued" && (
             <>
-              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "active")}>
+              <Button
+                fullWidth
+                onClick={() => handleStatusUpdate(statusPopup.id, "active")}
+              >
                 Move to Active
               </Button>
-              {/* <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "pending")}>
-                Back to Pending
-              </Button> */}
-              <Button fullWidth color="error" onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}>
+              <Button
+                fullWidth
+                color="error"
+                onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}
+              >
                 Cancel
               </Button>
             </>
           )}
+
           {statusPopup?.status === "active" && (
             <>
-              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "stopped")}>
+              <Button
+                fullWidth
+                onClick={() => handleStatusUpdate(statusPopup.id, "stopped")}
+              >
                 Stop Campaign
               </Button>
-              <Button fullWidth onClick={() => handleStatusUpdate(statusPopup.id, "active")}>
+              <Button
+                fullWidth
+                onClick={() => handleStatusUpdate(statusPopup.id, "active")}
+              >
                 Resume Campaign
               </Button>
-              <Button fullWidth color="error" onClick={() => setStatusPopup(null)}>
+              <Button
+                fullWidth
+                color="error"
+                onClick={() => setStatusPopup(null)}
+              >
                 Cancel
               </Button>
             </>

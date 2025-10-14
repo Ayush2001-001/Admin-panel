@@ -1,18 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box, Typography, Switch } from "@mui/material";
+import { Box, Typography, Switch, CircularProgress } from "@mui/material";
 import SettingsTable from "../../Table/settingsTable";
 import { fetchSettingsApi } from "../../../Api/settingsApi";
 
 export default function Setting() {
   const [settings, setSettings] = useState([]);
   const [emailEnabled, setEmailEnabled] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const loadSettings = async () => {
       try {
+        setLoading(true); 
         const res = await fetchSettingsApi();
+
         if (res?.data) {
           setSettings(res.data);
 
@@ -23,16 +26,49 @@ export default function Setting() {
         }
       } catch (err) {
         console.error("Error loading settings:", err);
+      } finally {
+        setLoading(false); 
       }
     };
 
     loadSettings();
   }, []);
 
+  const updatedSettings = settings.map((item) => {
+    if (item.setting_key === "lead_email_enabled") {
+      return {
+        ...item,
+        setting_value: emailEnabled ? "true" : "false",
+      };
+    } else {
+      return item;
+    }
+  });
+
+  if (loading) {
+    return (
+      <Box
+        sx={{
+          height: "70vh",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress />
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ p: 2 }}>
       <Typography
-        sx={{ fontSize: 22, fontWeight: "bold", mb: 2, color: "primary.main" }}
+        sx={{
+          fontSize: 22,
+          fontWeight: "bold",
+          mb: 2,
+          color: "primary.main",
+        }}
       >
         Settings
       </Typography>
@@ -51,13 +87,7 @@ export default function Setting() {
         </Typography>
       </Box>
 
-      <SettingsTable
-        settings={settings.map((s) =>
-          s.setting_key === "lead_email_enabled"
-            ? { ...s, setting_value: emailEnabled ? "true" : "false" }
-            : s
-        )}
-      />
+      <SettingsTable settings={updatedSettings} />
     </Box>
   );
 }
