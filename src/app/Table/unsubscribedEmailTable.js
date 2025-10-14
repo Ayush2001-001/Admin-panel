@@ -10,7 +10,10 @@ import {
   Paper,
   TablePagination,
   Button,
+  IconButton,
 } from "@mui/material";
+import Image from "next/image";
+
 
 export default function UnsubscribedEmailsTable({
   data,
@@ -78,14 +81,19 @@ export default function UnsubscribedEmailsTable({
                     {new Date(item.updated_at).toLocaleString()}
                   </TableCell>
                   <TableCell align="center">
-                    <Button
+                    <IconButton
                       size="small"
                       color="error"
                       onClick={() => onDelete(item.email)}
                       sx={{ textTransform: "none", fontSize: 11 }}
                     >
-                      Delete
-                    </Button>
+                      <Image
+                        src="/delete.svg"
+                        alt="Delete"
+                        width={18}
+                        height={18}
+                      />
+                    </IconButton>
                   </TableCell>
                 </TableRow>
               ))

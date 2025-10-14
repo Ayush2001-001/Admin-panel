@@ -27,7 +27,7 @@ export default function ContactsPage() {
   const [addOpen, setAddOpen] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
   const [newContact, setnewContact] = useState({});
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const loadContacts = async () => {
     try {

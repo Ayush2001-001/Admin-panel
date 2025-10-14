@@ -25,18 +25,18 @@ export default function UnsubscribedEmails() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [newEmail, setNewEmail] = useState("");
   const [importFile, setImportFile] = useState(null);
-  const [loading, setLoading] = useState(false); 
+  const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
     try {
-      setLoading(true); 
+      setLoading(true);
       const result = await fetchUnsubscribedEmails();
       setData(result);
     } catch (err) {
       console.error(err);
       toast.error("Failed to load data");
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
@@ -143,7 +143,8 @@ export default function UnsubscribedEmails() {
               sx={{ minWidth: 250 }}
             />
             <Button
-              variant="contained"
+              variant="outlined"
+              component="label"
               size="small"
               onClick={handleAddEmailClick}
               sx={{ textTransform: "none" }}

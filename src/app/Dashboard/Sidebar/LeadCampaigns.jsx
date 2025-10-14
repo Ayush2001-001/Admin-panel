@@ -27,7 +27,7 @@ export default function LeadCampaigns() {
   const [modalOpen, setModalOpen] = useState(false);
   const [editData, setEditData] = useState(null);
   const [statusPopup, setStatusPopup] = useState(null);
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const emptyCampaign = {
     title: "",
@@ -137,7 +137,7 @@ export default function LeadCampaigns() {
             setModalOpen(true);
           }}
         >
-          Add Campaign
+          Add Lead Campaign
         </Button>
       </Box>
 
@@ -212,7 +212,7 @@ export default function LeadCampaigns() {
           ))}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setModalOpen(false)}>Cancel</Button>
+          <Button onClick={() => setModalOpen(false)}>Close</Button>
           <Button variant="contained" onClick={handleSave}>
             Save
           </Button>
@@ -235,7 +235,7 @@ export default function LeadCampaigns() {
                 color="error"
                 onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}
               >
-                Cancel
+                Close
               </Button>
             </>
           )}
@@ -253,7 +253,7 @@ export default function LeadCampaigns() {
                 color="error"
                 onClick={() => handleStatusUpdate(statusPopup.id, "cancelled")}
               >
-                Cancel
+                Close
               </Button>
             </>
           )}
@@ -277,7 +277,7 @@ export default function LeadCampaigns() {
                 color="error"
                 onClick={() => setStatusPopup(null)}
               >
-                Cancel
+                Close
               </Button>
             </>
           )}
