@@ -1,14 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import LeadContactsTable from "../../Table/leadContactTable";
+import LeadContactsTable from "../table/LeadContactTable";
 import {
   fetchLeadContacts,
   importLeadContacts,
   addLeadContact,
   updateLeadContact,
   deleteLeadContact,
-} from "../../../Api/leadContactApi";
+} from "../../app/api/LeadContactApi";
 
 export default function ContactsPage() {
   const [contacts, setContacts] = useState([]);

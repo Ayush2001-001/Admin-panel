@@ -8,8 +8,8 @@ import {
   Autocomplete,
   CircularProgress,
 } from "@mui/material";
-import { fetchEmailQueues } from "../../../Api/emailqueueApi";
-import EmailQueuesTable from "../../Table/emailqueueTable";
+import { fetchEmailQueues } from "../../app/api/EmailQueueApi";
+import EmailQueuesTable from "../table/EmailQueueTable";
 
 export default function EmailQueues() {
   const [data, setData] = useState([]);
@@ -18,7 +18,7 @@ export default function EmailQueues() {
   const [designationFilter, setDesignationFilter] = useState("All");
   const [companyFilter, setCompanyFilter] = useState("All");
   const [businessFilter, setBusinessFilter] = useState("All");
-  const [loading, setLoading] = useState(true); 
+  const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
