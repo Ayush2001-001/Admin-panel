@@ -19,7 +19,7 @@ import {
   saveCampaign,
   deleteCampaign,
   updateCampaignStatus,
-} from "../../app/api/LeadCampaignApi";
+} from "../api/LeadCampaignApi";
 
 export default function LeadCampaigns() {
   const [campaigns, setCampaigns] = useState([]);

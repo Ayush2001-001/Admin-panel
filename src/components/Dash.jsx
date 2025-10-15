@@ -10,7 +10,7 @@ import {
   Fade,
 } from "@mui/material";
 import { People, Contacts, Campaign, Email } from "@mui/icons-material";
-import { fetchDashboardData } from "../../app/api/DashboardApi";
+import { fetchDashboardData } from "../app/api/DashboardApi";
 
 export default function DashboardPage() {
   const [data, setData] = useState(null);

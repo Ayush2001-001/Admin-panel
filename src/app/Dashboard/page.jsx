@@ -24,22 +24,24 @@ import {
   Menu as MenuIcon,
 } from "@mui/icons-material";
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  useNavigate,
-  Navigate,
-} from "react-router-dom";
+// import {
+//   BrowserRouter as Router,
+//   Routes,
+//   Route,
+//   useNavigate,
+//   Navigate,
+// } from "react-router-dom";
 
-import Users from "../../components/sidebar/User";
-import LeadContact from "../../components/sidebar/LeadContact";
-import LeadCampaigns from "../../components/sidebar/LeadCampaigns";
-import EmailQueues from "../../components/sidebar/EmailQueue";
-import Templates from "../../components/sidebar/Templates";
-import Setting from "../../components/sidebar/Setting";
-import UnsubscribedEmails from "../../components/sidebar/UnSubscribedEmails";
-import DashboardPage from "../../components/sidebar/Dash";
+// import Users from "../user/page";
+// import LeadContact from "../lead_contact/page";
+// import LeadCampaigns from "../";
+// import EmailQueues from "../../components/sidebar/EmailQueue";
+// import Templates from "../template/page";
+// import Setting from "../../components/sidebar/Setting";
+// import UnsubscribedEmails from "../unsubscribed_email/page";
+import DashboardPage from "../../components/Dash";
+
+
 
 import Navbar from "../../components/Navbar";
 
@@ -49,9 +51,9 @@ const collapsedWidth = 60;
 const menu = [
   { path: "/dashboard", label: "Dashboard", icon: <DashboardIcon /> },
   { path: "/users", label: "Users", icon: <People /> },
-  { path: "/lead_Contacts", label: "Lead Contact", icon: <Contacts /> },
-  { path: "/lead_Campaigns", label: "Lead Campaigns", icon: <Campaign /> },
-  { path: "/email_Queues", label: "Email Queues", icon: <Email /> },
+  { path: "/lead_contacts", label: "Lead Contact", icon: <Contacts /> },
+  { path: "/lead_campaigns", label: "Lead Campaigns", icon: <Campaign /> },
+  { path: "/email_queues", label: "Email Queues", icon: <Email /> },
   {
     path: "/unSubscribed_Emails",
     label: "Unsubscribed Emails",
@@ -62,7 +64,7 @@ const menu = [
 ];
 
 function Sidebar({ open }) {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [selected, setSelected] = useState("/dashboard");
 
   return (
@@ -81,6 +83,7 @@ function Sidebar({ open }) {
     >
       <Toolbar />
       <Divider />
+      <Link>
       <List>
         {menu.map((item) => (
           <Tooltip
@@ -126,11 +129,12 @@ function Sidebar({ open }) {
           </Tooltip>
         ))}
       </List>
+      </Link>
     </Drawer>
   );
 }
 
-function DashboardLayout() {
+ export default function DashboardLayout() {
   const [open] = useState(true);
 
   return (
@@ -148,8 +152,9 @@ function DashboardLayout() {
         }}
       >
         <Toolbar />
+        <DashboardPage/>
 
-        <Routes>
+        {/* <Routes>
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/users" element={<Users />} />
           <Route path="/lead_Contacts" element={<LeadContact />} />
@@ -159,16 +164,16 @@ function DashboardLayout() {
           <Route path="/templates" element={<Templates />} />
           <Route path="/setting" element={<Setting />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
-        </Routes>
+        </Routes> */}
       </Box>
     </Box>
   );
 }
 
-export default function Dashboard() {
-  return (
-    <Router>
-      <DashboardLayout />
-    </Router>
-  );
-}
+// export default function Dashboard() {
+//   return (
+//     <Router>
+//       <DashboardLayout />
+//     </Router>
+//   );
+// }

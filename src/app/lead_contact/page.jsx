@@ -8,7 +8,7 @@ import {
   addLeadContact,
   updateLeadContact,
   deleteLeadContact,
-} from "../../app/api/LeadContactApi";
+} from "../api/LeadContactApi";
 
 export default function ContactsPage() {
   const [contacts, setContacts] = useState([]);
