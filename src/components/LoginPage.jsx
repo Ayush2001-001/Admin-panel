@@ -13,8 +13,8 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import ROUTES from "../routes";
-import { loginUser } from "../../Api/auth";
+import ROUTES from "../app/Routes";
+import { loginUser } from "../app/api/Auth";
 
 export default function LoginPage() {
   const router = useRouter();

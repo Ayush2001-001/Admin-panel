@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { Box, Typography, Switch, CircularProgress } from "@mui/material";
-import SettingsTable from "../../Table/settingsTable";
-import { fetchSettingsApi } from "../../../Api/settingsApi";
+import SettingsTable from "../table/SettingsTable";
+import { fetchSettingsApi } from "../../app/api/SettingsApi";
 
 export default function Setting() {
   const [settings, setSettings] = useState([]);
@@ -13,7 +13,7 @@ export default function Setting() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        setLoading(true); 
+        setLoading(true);
         const res = await fetchSettingsApi();
 
         if (res?.data) {
@@ -27,7 +27,7 @@ export default function Setting() {
       } catch (err) {
         console.error("Error loading settings:", err);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 

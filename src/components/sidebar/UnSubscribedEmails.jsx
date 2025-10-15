@@ -15,8 +15,8 @@ import {
   addUnsubscribedEmail,
   deleteUnsubscribedEmail,
   importUnsubscribedEmails,
-} from "../../../Api/unsubscribedEmailApi";
-import UnsubscribedEmailsTable from "../../Table/unsubscribedEmailTable";
+} from "../../app/api/UnsubscribedEmailApi";
+import UnsubscribedEmailsTable from "../table/UnsubscribedEmailTable";
 
 export default function UnsubscribedEmails() {
   const [data, setData] = useState([]);

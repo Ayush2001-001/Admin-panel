@@ -32,16 +32,16 @@ import {
   Navigate,
 } from "react-router-dom";
 
-import Users from "./Sidebar/user";
-import LeadContact from "./Sidebar/leadContact";
-import LeadCampaigns from "./Sidebar/LeadCampaigns";
-import EmailQueues from "./Sidebar/EmailQues";
-import Templates from "./Sidebar/Templates";
-import Setting from "./Sidebar/Setting";
-import UnsubscribedEmails from "./Sidebar/UnSubscribedEmails";
-import DashboardPage from "./Sidebar/dash";
+import Users from "../../components/sidebar/User";
+import LeadContact from "../../components/sidebar/LeadContact";
+import LeadCampaigns from "../../components/sidebar/LeadCampaigns";
+import EmailQueues from "../../components/sidebar/EmailQueue";
+import Templates from "../../components/sidebar/Templates";
+import Setting from "../../components/sidebar/Setting";
+import UnsubscribedEmails from "../../components/sidebar/UnSubscribedEmails";
+import DashboardPage from "../../components/sidebar/Dash";
 
-import Navbar from "./Navbar/page"
+import Navbar from "../../components/Navbar";
 
 const drawerWidth = 190;
 const collapsedWidth = 60;
@@ -136,7 +136,7 @@ function DashboardLayout() {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <Navbar /> 
+      <Navbar />
       <Sidebar open={open} />
       <Box
         component="main"
