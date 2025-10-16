@@ -83,7 +83,6 @@ function Sidebar({ open }) {
     >
       <Toolbar />
       <Divider />
-      <Link>
       <List>
         {menu.map((item) => (
           <Tooltip
@@ -129,7 +128,6 @@ function Sidebar({ open }) {
           </Tooltip>
         ))}
       </List>
-      </Link>
     </Drawer>
   );
 }
