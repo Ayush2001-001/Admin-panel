@@ -12,8 +12,8 @@ import {
   DialogActions,
   CircularProgress,
 } from "@mui/material";
-import UsersTable from "../table/UsersTable";
-import { fetchCurrentUser } from "../../app/api/UsersApi";
+import UsersTable from "../../components/table/UsersTable";
+import { fetchCurrentUser } from "../api/UsersApi";
 
 export default function Users() {
   const [users, setUsers] = useState([]);

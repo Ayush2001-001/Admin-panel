@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Box, Typography, Switch, CircularProgress } from "@mui/material";
 import SettingsTable from "../table/SettingsTable";
-import { fetchSettingsApi } from "../../app/api/SettingsApi";
+import { fetchSettingsApi } from "../api/SettingsApi";
 
 export default function Setting() {
   const [settings, setSettings] = useState([]);
