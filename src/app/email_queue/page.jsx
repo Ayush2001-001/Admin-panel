@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { fetchEmailQueues } from "../api/EmailQueueApi";
-import EmailQueuesTable from "../table/EmailQueueTable";
+import EmailQueuesTable from "../../components/table/EmailQueueTable";
 
 export default function EmailQueues() {
   const [data, setData] = useState([]);

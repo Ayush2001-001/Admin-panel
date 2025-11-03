@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { Box, CircularProgress } from "@mui/material";
-import LeadContactsTable from "../table/LeadContactTable";
+import LeadContactsTable from "../../components/table/LeadContactTable";
 import {
   fetchLeadContacts,
   importLeadContacts,

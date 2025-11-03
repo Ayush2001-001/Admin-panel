@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Box, Typography, Switch, CircularProgress } from "@mui/material";
-import SettingsTable from "../table/SettingsTable";
+import SettingsTable from "../../components/table/SettingsTable";
 import { fetchSettingsApi } from "../api/SettingsApi";
 
 export default function Setting() {
@@ -10,6 +10,7 @@ export default function Setting() {
   const [emailEnabled, setEmailEnabled] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  // ✅ Load settings from API
   useEffect(() => {
     const loadSettings = async () => {
       try {
@@ -18,7 +19,6 @@ export default function Setting() {
 
         if (res?.data) {
           setSettings(res.data);
-
           const leadSetting = res.data.find(
             (item) => item.setting_key === "lead_email_enabled"
           );
@@ -34,16 +34,23 @@ export default function Setting() {
     loadSettings();
   }, []);
 
-  const updatedSettings = settings.map((item) => {
-    if (item.setting_key === "lead_email_enabled") {
-      return {
-        ...item,
-        setting_value: emailEnabled ? "true" : "false",
-      };
-    } else {
-      return item;
-    }
-  });
+  // ✅ Toggle switch & sync table instantly
+  const handleToggleEmail = () => {
+    setEmailEnabled((prev) => {
+      const newValue = !prev;
+
+      // Update table immediately
+      setSettings((prevSettings) =>
+        prevSettings.map((item) =>
+          item.setting_key === "lead_email_enabled"
+            ? { ...item, setting_value: newValue ? "true" : "false" }
+            : item
+        )
+      );
+
+      return newValue;
+    });
+  };
 
   if (loading) {
     return (
@@ -73,9 +80,14 @@ export default function Setting() {
         Settings
       </Typography>
 
+      {/* ✅ Switch now updates instantly */}
       <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
         <Typography sx={{ fontSize: 13 }}>Lead Email Sending:</Typography>
-        <Switch checked={emailEnabled} color="primary" disabled />
+        <Switch
+          checked={emailEnabled}
+          onChange={handleToggleEmail}
+          color="primary"
+        />
         <Typography
           sx={{
             fontSize: 13,
@@ -87,7 +99,7 @@ export default function Setting() {
         </Typography>
       </Box>
 
-      <SettingsTable settings={updatedSettings} />
+      <SettingsTable settings={settings} />
     </Box>
   );
 }
