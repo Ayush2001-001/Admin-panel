@@ -12,8 +12,8 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import ROUTES from "../routes";
-import { resetPassword } from "../../Api/auth";
+import ROUTES from "../app/Routes";
+import { resetPassword} from "../app/api/Auth";
 
 export default function ResetPasswordPage() {
   const router = useRouter();

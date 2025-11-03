@@ -11,8 +11,8 @@ import {
   Button,
   CircularProgress,
 } from "@mui/material";
-import ROUTES from "../routes";
-import { forgotPassword } from "../../Api/auth";
+import ROUTES from "../app/Routes";
+import { forgotPassword } from "../app/api/Auth";
 
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");

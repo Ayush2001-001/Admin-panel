@@ -12,14 +12,14 @@ import {
   Autocomplete,
   CircularProgress,
 } from "@mui/material";
-import LeadCampaignTable from "../table/LeadCampaignTable";
+import LeadCampaignTable from "../../components/table/LeadCampaignTable";
 import {
   fetchCampaigns,
   fetchMeta,
   saveCampaign,
   deleteCampaign,
   updateCampaignStatus,
-} from "../../app/api/LeadCampaignApi";
+} from "../api/LeadCampaignApi";
 
 export default function LeadCampaigns() {
   const [campaigns, setCampaigns] = useState([]);

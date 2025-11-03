@@ -1,7 +1,7 @@
 const ROUTES = {
   LOGIN: "/",
-  FORGOT_PASSWORD: "/forgotPassword",
-  RESET_PASSWORD: "/ResetPassword",
+  FORGOT_PASSWORD: "/forgot_password",
+  RESET_PASSWORD: "/reset_password",
   DASHBOARD: "/dashboard",
 };
 export default ROUTES;
